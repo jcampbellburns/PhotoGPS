@@ -1,1 +1,0 @@
-Switching main form to use a treeview, listview to display locations and photos. This version has locations and photos on separate tabs.

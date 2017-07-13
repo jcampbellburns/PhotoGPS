@@ -196,7 +196,7 @@ Partial Public Class FMain
         End If
     End Sub
 
-#If DEBUG Then
+
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs)
         'DEBUG: Starts debugger.
         'loc has the currently highlighted location (or the first if multiple selections)
@@ -210,7 +210,7 @@ Partial Public Class FMain
         Stop
     End Sub
 
-#End If
+
 End Class
 
 

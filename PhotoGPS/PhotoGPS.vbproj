@@ -48,11 +48,14 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ExifLib">
+      <HintPath>..\lib\ExifLib.dll</HintPath>
+    </Reference>
     <Reference Include="GMap.NET.Core">
-      <HintPath>GMap\GMap.NET.Core.dll</HintPath>
+      <HintPath>..\lib\GMap.NET.Core.dll</HintPath>
     </Reference>
     <Reference Include="GMap.NET.WindowsForms">
-      <HintPath>GMap\GMap.NET.WindowsForms.dll</HintPath>
+      <HintPath>..\lib\GMap.NET.WindowsForms.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
@@ -151,10 +154,6 @@
     <ProjectReference Include="..\CSVSerializer\CSVSerializer.vbproj">
       <Project>{6b19c519-e508-411c-9ee3-2acc6c6a6b83}</Project>
       <Name>CSVSerializer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ExifLif Download\Exiflib\ExifLib.csproj">
-      <Project>{c878a95f-e695-42fc-a714-e47df6515679}</Project>
-      <Name>ExifLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\WaitWindow\WaitWindow.vbproj">
       <Project>{1f6ea2ed-d9df-49f2-9908-13346da917c0}</Project>

@@ -3,10 +3,3 @@ https://www.codeproject.com/Articles/36342/ExifLib-A-Fast-Exif-Data-Extractor-fo
 
 GMap.NET
 https://www.codeproject.com/Articles/32643/GMap-NET-Great-Maps-for-Windows-Forms-and-Presenta
-
-
-
-
-
-#####NOTES#####
--Location needs to have a field for how many photos.

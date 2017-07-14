@@ -536,7 +536,6 @@ Partial Class FMain
         Me.LVPhotos.Location = New System.Drawing.Point(0, 0)
         Me.LVPhotos.Name = "LVPhotos"
         Me.LVPhotos.Size = New System.Drawing.Size(231, 478)
-        Me.LVPhotos.SmallImageList = Me.ILFolder
         Me.LVPhotos.TabIndex = 4
         Me.LVPhotos.UseCompatibleStateImageBehavior = False
         Me.LVPhotos.View = System.Windows.Forms.View.Details

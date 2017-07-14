@@ -208,6 +208,12 @@ Partial Public Class FMain
 
         Stop
     End Sub
+
+
+    'Private _PhotoLVItems As List(Of LVItem(Of Photo))
+    'Private _PhotosOverlay As New WindowsForms.GMapOverlay("Photos")
+
+
 End Class
 
 

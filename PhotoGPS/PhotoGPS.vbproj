@@ -83,6 +83,7 @@
     <Compile Include="FMain %28Photos Listview%29.vb" />
     <Compile Include="FMain %28Locations Listview%29.vb" />
     <Compile Include="PointExtensions.vb" />
+    <Compile Include="Project.vb" />
     <Compile Include="ToolStripCalendarDropdown.vb">
       <SubType>Component</SubType>
     </Compile>

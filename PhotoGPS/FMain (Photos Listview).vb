@@ -66,6 +66,7 @@ Partial Class FMain
                     photos = CSVSerializer.CSVDeserializer(Of Photo).Deserialize(mf, Me, True, pb)
 
                     'remove outdated entries
+                    '==Possible location for optimization: this is pretty slow when files are compared over a network. Maybe see if there's a way to get all of the file exists, file dates, and file sizes with as few FS accesses as possible. Right now, it's 3 FS requests per file==
                     photos.RemoveAll(
                         Function(i)
                             If pb IsNot Nothing Then pb("Removing outdated photos from metadata cache.", (photos.IndexOf(i) / photos.Count))
@@ -77,9 +78,9 @@ Partial Class FMain
                             Else
                                 Return True
                             End If
-
-
                         End Function)
+
+
 
                 End If
 

@@ -184,16 +184,42 @@ Partial Class FMain
     Private Sub LVLocations_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVLocations.SelectedIndexChanged
         Dim Selection = (From i In LVLocations.SelectedItems).ToList
 
-        If Selection.Contains(_AllFilesItem) Then
-            If Selection.Count > 1 Then
-                LVLocations.SelectedItems.Clear()
-                _AllFilesItem.Selected = True
+        If Selection.Count > 0 Then
+            If Selection.Contains(_AllFilesItem) Then
+                If Selection.Count > 1 Then
+                    LVLocations.SelectedItems.Clear()
+                    _AllFilesItem.Selected = True
+                Else
+                    UpdateListView(Of IO.DirectoryInfo)(_FolderLVItems, LVPhotos, True, Function(p) True)
+                    UpdateListView(Of Photo)(_PhotoLVItems, LVPhotos, False, Function(p) True)
+                End If
             Else
-                'logic to show folders and files
-                'Me.RefreshFilesFromFolder(Nothing)
+                'logic to show photos matching selected location(s)
+
+                If (_LocationLVItems IsNot Nothing) And (_PhotoLVItems IsNot Nothing) Then
+                    If (_LocationLVItems.Count > 0) And (_PhotoLVItems.Count > 0) Then
+                        'left off here. special handeling when selecting a location with 0 photos
+                        Dim SelectedLocations = From i In _LocationLVItems Where i.LVItem.Selected Select i.Item
+
+                        Dim b = (From i In SelectedLocations Select i.Photos).ToList
+
+                        Dim c As New List(Of Photo)
+
+                        b.ForEach(Sub(i) c.AddRange(i))
+
+                        c = c.Distinct.ToList
+
+                        Dim d = New List(Of LVItem(Of Photo))
+
+                        c.ForEach(Sub(i) d.Add((From j In _PhotoLVItems Where i Is j.Item).First))
+
+                        UpdateListView(Of Photo)(d, LVPhotos, True, Function(i) True)
+
+                    End If
+                End If
             End If
-        Else
-            'logic to show photos matching selected location(s)
         End If
+
+
     End Sub
 End Class

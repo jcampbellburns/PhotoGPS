@@ -85,7 +85,7 @@ Partial Public Class FMain
     ''' <param name="ClearListView">If <c>True</c>, the <see cref="ListView"/> control will be cleared before populating the items and if the user cancels the action. If <c>False</c>, the <see cref="ListView"/> control will notbe cleared before populating the items and if the user cancels the action.</param>
     ''' <param name="FilterFunction">A <see cref="Predicate(Of T)"/> which returns <c>True</c> if the item is to be displayed in the list or <c>False</c> if not. If this parameter is <c>null</c>, all items are displayed.</param>
     ''' <param name="PostbackFunction">A <see cref="WaitWindow.PostBack"/> to be called to indicate progress to the user and to allow cancellation.</param>
-    Private Shared Sub UpdateListView(Of T)(ItemList As IEnumerable(Of LVItem(Of T)), ListView As ListView, ClearListView As Boolean, FilterFunction As Predicate(Of T), PostbackFunction As WaitWindow.PostBack)
+    Private Shared Sub UpdateListView(Of T)(ItemList As IEnumerable(Of LVItem(Of T)), ListView As ListView, ClearListView As Boolean, FilterFunction As Predicate(Of T), Optional PostbackFunction As WaitWindow.PostBack = Nothing)
 
 
         Dim lvitems As List(Of ListViewItem) = Nothing
@@ -196,7 +196,6 @@ Partial Public Class FMain
         End If
     End Sub
 
-
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs)
         'DEBUG: Starts debugger.
         'loc has the currently highlighted location (or the first if multiple selections)
@@ -209,8 +208,6 @@ Partial Public Class FMain
 
         Stop
     End Sub
-
-
 End Class
 
 

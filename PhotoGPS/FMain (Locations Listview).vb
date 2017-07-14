@@ -185,39 +185,65 @@ Partial Class FMain
         Dim Selection = (From i In LVLocations.SelectedItems).ToList
 
         If Selection.Count > 0 Then
+
+            LVPhotos.BeginUpdate()
+
             If Selection.Contains(_AllFilesItem) Then
                 If Selection.Count > 1 Then
+                    'A selection in the Locations listview may contain either "(All Files)" or any combination of single or multiple locations which are not "(All Files)". If an attempt is made to select multiple and include "(All Files)", clear the selection and select only "(All Files)".
                     LVLocations.SelectedItems.Clear()
                     _AllFilesItem.Selected = True
                 Else
+                    'If "(All Files)" is selected, show folders and files
                     UpdateListView(Of IO.DirectoryInfo)(_FolderLVItems, LVPhotos, True, Function(p) True)
                     UpdateListView(Of Photo)(_PhotoLVItems, LVPhotos, False, Function(p) True)
                 End If
             Else
-                'logic to show photos matching selected location(s)
+
+                'If one or more locations are selected, show photos relevant to all of them
 
                 If (_LocationLVItems IsNot Nothing) And (_PhotoLVItems IsNot Nothing) Then
                     If (_LocationLVItems.Count > 0) And (_PhotoLVItems.Count > 0) Then
-                        'left off here. special handeling when selecting a location with 0 photos
-                        Dim SelectedLocations = From i In _LocationLVItems Where i.LVItem.Selected Select i.Item
+                        'The code in this if...then block:
+                        '   1: Get a list of the selected items in LocationsLV
+                        '   2: Convert to list of LVItem(Of Location) from _LocationLVItems (this is to get the relevant Location from e ach   ListViewItem
+                        '   3: Get all of the photos from the list of LVItem(Of Location). The list is initially a List(Of Photo) for each    location so the result of the query is List(Of List(Of Photo)).
+                        '   4: Convert said list to a single List(Of Photo)
+                        '   5: Since a photo might belong to more than one Location, remove duplicate items using List(Of   P hoto).Distinct.ToList (we need it to still be a List(of Photo) when we're done)
+                        '   6: We need a List(Of LVItem(Of Photo)) to update the listview.
+                        '   7: Update the ListView
 
-                        Dim b = (From i In SelectedLocations Select i.Photos).ToList
+                        'Steps 1 and 2 are above where local variable Selection is defined
 
-                        Dim c As New List(Of Photo)
+                        'Step 3
+                        Dim ListOfListOfPhotosFromSelectedLocations = (From i In Selection Select i.Photos).ToList
 
-                        b.ForEach(Sub(i) c.AddRange(i))
+                        'Step 4
+                        Dim ListOfPhotosFromSelectedLocations As New List(Of Photo)
 
-                        c = c.Distinct.ToList
+                        ListOfListOfPhotosFromSelectedLocations.ForEach(
+                            Sub(i)
+                                If i IsNot Nothing Then
+                                    ListOfPhotosFromSelectedLocations.AddRange(i)
+                                End If
+                            End Sub)
 
-                        Dim d = New List(Of LVItem(Of Photo))
+                        'Step 5
+                        ListOfPhotosFromSelectedLocations = ListOfPhotosFromSelectedLocations.Distinct.ToList
 
-                        c.ForEach(Sub(i) d.Add((From j In _PhotoLVItems Where i Is j.Item).First))
+                        'Step 6
+                        Dim ListOfLVItemOfPhotoFromSelectedLocations = New List(Of LVItem(Of Photo))
 
-                        UpdateListView(Of Photo)(d, LVPhotos, True, Function(i) True)
+                        ListOfPhotosFromSelectedLocations.ForEach(Sub(i) ListOfLVItemOfPhotoFromSelectedLocations.Add((From j In _PhotoLVItems Where i Is j.Item).First))
+
+                        'Step 7
+                        UpdateListView(Of Photo)(ListOfLVItemOfPhotoFromSelectedLocations, LVPhotos, True, Function(i) True)
 
                     End If
                 End If
             End If
+
+            LVPhotos.EndUpdate()
         End If
 
 

@@ -6,7 +6,7 @@ End Class
 
 'Locations listview methods
 Partial Class FMain
-    Private _LocationLVItems As List(Of LVItem(Of Location))
+    Private _LocationLVItems As New List(Of LVItem(Of Location))
     Private _LocationsOverlay As New WindowsForms.GMapOverlay("Locations")
 
     Private _AllFilesItem As New ListViewItem("(All Files)")
@@ -30,7 +30,7 @@ Partial Class FMain
                         Sub()
                             Try
                                 'Initialize location lists (LVItems, and markers)
-                                _LocationLVItems = New List(Of LVItem(Of Location))
+                                _LocationLVItems.Clear()
                                 _LocationsOverlay.Markers.Clear()
 
                                 'save current state of location overlay then hides it (speeds up populating the markers on the map)
@@ -59,7 +59,7 @@ Partial Class FMain
 
                                 RefreshLocations(pb)
 
-                                UpdateLocationPhotosLists(pb)
+                                UpdateLocationPhotosLists()
 
                             Catch ex As WaitWindow.DoItCanceledException
                                 'user clicked cancel re-initialize location lists.
@@ -99,13 +99,13 @@ Partial Class FMain
     End Sub
 
     Private Sub TSBLocationDateFilter_FilterUpdated(sender As Object, e As EventArgs) Handles TSBLocationDateFilter.FilterUpdated
-        If _LocationLVItems IsNot Nothing Then
-            If _LocationLVItems.Count < 1000 Then
-                RefreshLocations()
-            Else
-                WaitWindow.WaitForIt.DoIt("Filtering", Sub(pb) Me.Invoke(Sub() RefreshLocations(pb)), Me)
-            End If
+
+        If _LocationLVItems.Count < 1000 Then
+            RefreshLocations()
+        Else
+            WaitWindow.WaitForIt.DoIt("Filtering", Sub(pb) Me.Invoke(Sub() RefreshLocations(pb)), Me)
         End If
+
     End Sub
 
     Private Sub TSBExportLocations_Click(sender As Object, e As EventArgs) Handles TSBExportLocations.Click
@@ -144,108 +144,48 @@ Partial Class FMain
 
     Private Sub TSBGetLocationCoords_Click(sender As Object, e As EventArgs) Handles TSBGetLocationCoords.Click
 
-        If _LocationLVItems IsNot Nothing Then
-            WaitWindow.WaitForIt.DoIt("Retreiving GPS coordinates for selected locations",
-                Sub(pb)
-                    Try
-                        Dim a As List(Of LVItem(Of Location)) = Nothing
+        WaitWindow.WaitForIt.DoIt("Retreiving GPS coordinates for selected locations",
+        Sub(pb)
+            Try
+                Dim a As List(Of LVItem(Of Location)) = Nothing
 
-                        Me.Invoke(Sub() a = (From i In _LocationLVItems Where (Me.LVLocations.Items.Contains(i.LVItem)) And (i.LVItem.Selected = True) And (i.Item.GPS.HasValue = False) And (String.IsNullOrWhiteSpace(i.Item.Address) = False)).ToList)
+                Me.Invoke(Sub() a = (From i In _LocationLVItems Where (Me.LVLocations.Items.Contains(i.LVItem)) And (i.LVItem.Selected = True) And (i.Item.GPS.HasValue = False) And (String.IsNullOrWhiteSpace(i.Item.Address) = False)).ToList)
 
-                        a.ForEach(
-                      Sub(i)
-                          pb("Getting coordinates for " & i.Item.Address, a.IndexOf(i) / a.Count)
+                a.ForEach(
+                Sub(i)
+#If DEBUG Then
+                    i = i 'for some reason, a lack of this line causes a compiler warning that i.Item and i.LVItem are being used before it was assigned.
+#End If
+                    pb.Invoke("Getting coordinates for " & i.Item.Address, a.IndexOf(i) / a.Count)
 
-                          Dim status As GeoCoderStatusCode
-                          i.Item.GPS = MapProviders.GMapProviders.GoogleMap.GetPoint(i.Item.Address, status)
+                    Dim status As GeoCoderStatusCode
+                    i.Item.GPS = MapProviders.GMapProviders.GoogleMap.GetPoint(i.Item.Address, status)
 
-                          If i.Item.GPS.HasValue Then
-                              Me.Invoke(
-                                Sub()
-                                    i.LVItem.SubItems(4).Text = i.Item.Lat.Value.ToString("0.000000")
-                                    i.LVItem.SubItems(5).Text = i.Item.[Long].Value.ToString("0.000000")
-                                End Sub)
-                          Else
-                              Stop
-                          End If
+                    If i.Item.GPS.HasValue Then
+                        Me.Invoke(
+                        Sub()
+                            i.LVItem.SubItems(4).Text = i.Item.Lat.Value.ToString("0.000000")
+                            i.LVItem.SubItems(5).Text = i.Item.[Long].Value.ToString("0.000000")
+                        End Sub)
+                    Else
+                        Stop
+                    End If
 
-                      End Sub)
+                End Sub)
 
-                    Catch ex As WaitWindow.DoItCanceledException
-                        'cancel was clicked by the user
-                    Finally
-                        Me.Invoke(Sub() AutosizeColumns(LVLocations))
-                    End Try
+            Catch ex As WaitWindow.DoItCanceledException
+                'cancel was clicked by the user
+            Finally
+                Me.Invoke(Sub() AutosizeColumns(LVLocations))
+            End Try
 
-                End Sub, Me)
-        End If
+        End Sub, Me)
+
     End Sub
 
     Private Sub LVLocations_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVLocations.SelectedIndexChanged
-        Dim Selection = (From i In LVLocations.SelectedItems).ToList
-
-        If Selection.Count > 0 Then
-
-            LVPhotos.BeginUpdate()
-
-            If Selection.Contains(_AllFilesItem) Then
-                If Selection.Count > 1 Then
-                    'A selection in the Locations listview may contain either "(All Files)" or any combination of single or multiple locations which are not "(All Files)". If an attempt is made to select multiple and include "(All Files)", clear the selection and select only "(All Files)".
-                    LVLocations.SelectedItems.Clear()
-                    _AllFilesItem.Selected = True
-                Else
-                    'If "(All Files)" is selected, show folders and files
-                    UpdateListView(Of IO.DirectoryInfo)(_FolderLVItems, LVPhotos, True, Function(p) True)
-                    UpdateListView(Of Photo)(_PhotoLVItems, LVPhotos, False, Function(p) True)
-                End If
-            Else
-
-                'If one or more locations are selected, show photos relevant to all of them
-
-                If (_LocationLVItems IsNot Nothing) And (_PhotoLVItems IsNot Nothing) Then
-                    If (_LocationLVItems.Count > 0) And (_PhotoLVItems.Count > 0) Then
-                        'The code in this if...then block:
-                        '   1: Get a list of the selected items in LocationsLV
-                        '   2: Convert to list of LVItem(Of Location) from _LocationLVItems (this is to get the relevant Location from e ach   ListViewItem
-                        '   3: Get all of the photos from the list of LVItem(Of Location). The list is initially a List(Of Photo) for each    location so the result of the query is List(Of List(Of Photo)).
-                        '   4: Convert said list to a single List(Of Photo)
-                        '   5: Since a photo might belong to more than one Location, remove duplicate items using List(Of   P hoto).Distinct.ToList (we need it to still be a List(of Photo) when we're done)
-                        '   6: We need a List(Of LVItem(Of Photo)) to update the listview.
-                        '   7: Update the ListView
-
-                        'Steps 1 and 2 are above where local variable Selection is defined
-
-                        'Step 3
-                        Dim ListOfListOfPhotosFromSelectedLocations = (From i In Selection Select i.Photos).ToList
-
-                        'Step 4
-                        Dim ListOfPhotosFromSelectedLocations As New List(Of Photo)
-
-                        ListOfListOfPhotosFromSelectedLocations.ForEach(
-                            Sub(i)
-                                If i IsNot Nothing Then
-                                    ListOfPhotosFromSelectedLocations.AddRange(i)
-                                End If
-                            End Sub)
-
-                        'Step 5
-                        ListOfPhotosFromSelectedLocations = ListOfPhotosFromSelectedLocations.Distinct.ToList
-
-                        'Step 6
-                        Dim ListOfLVItemOfPhotoFromSelectedLocations = New List(Of LVItem(Of Photo))
-
-                        ListOfPhotosFromSelectedLocations.ForEach(Sub(i) ListOfLVItemOfPhotoFromSelectedLocations.Add((From j In _PhotoLVItems Where i Is j.Item).First))
-
-                        'Step 7
-                        UpdateListView(Of Photo)(ListOfLVItemOfPhotoFromSelectedLocations, LVPhotos, True, Function(i) True)
-
-                    End If
-                End If
-            End If
-
-            LVPhotos.EndUpdate()
-        End If
-
-
+        UpdatePhotosListview()
     End Sub
+
+
 End Class

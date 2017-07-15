@@ -6,223 +6,141 @@ End Class
 
 'Photos listview methods
 Partial Class FMain
-    Private _currentFolder As String
-    Private _PhotoLVItems As List(Of LVItem(Of Photo))
-    Private _FolderLVItems As List(Of LVItem(Of IO.DirectoryInfo))
+    Private _PhotoLVItems As New List(Of LVItem(Of Photo))
     Private _PhotosOverlay As New WindowsForms.GMapOverlay("Photos")
 
-    Private Sub TBFolder_TextChanged(sender As Object, e As EventArgs) Handles TBFolder.TextChanged
-        'give visual feedback if the typed folder is valid
-        TBFolder.ForeColor = If(IO.Directory.Exists(TBFolder.Text), SystemColors.ControlText, Drawing.Color.Red)
-    End Sub
+    Private Sub TSBAddPhotosFolder_Click(sender As Object, e As EventArgs) Handles TSBAddPhotosFolder.Click
+        If FolderBrowserDialog1.ShowDialog(Me) = DialogResult.OK Then
+            Dim MsgBoxRecursiveResponse = MsgBox("Load all photos from subfolders recursively as well?", MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Question Or MsgBoxStyle.DefaultButton2)
 
-    Private Sub TSBBrowseForFolder_Click(sender As Object, e As EventArgs) Handles TSBBrowseForFolder.Click
-        'browse for folder
-        Dim folderBrowseWindow As New FolderBrowserDialog With {
-            .ShowNewFolderButton = False,
-            .SelectedPath = If(IO.Directory.Exists(TBFolder.Text), TBFolder.Text, "")}
+            If MsgBoxRecursiveResponse <> MsgBoxResult.Cancel Then
+                Dim AllFiles = IO.Directory.EnumerateFiles(FolderBrowserDialog1.SelectedPath, "*", If(MsgBoxRecursiveResponse = MsgBoxResult.Yes, IO.SearchOption.AllDirectories, IO.SearchOption.TopDirectoryOnly))
 
-        If folderBrowseWindow.ShowDialog = DialogResult.OK Then
-            CurrentFolder = folderBrowseWindow.SelectedPath
+                Dim FilteredFiles As New List(Of String)
+
+                For Each ext In Photo.SupportedExtensions
+                    FilteredFiles.AddRange(From i In AllFiles Where i Like ext)
+                Next
+
+                AddPhotoFiles(FilteredFiles.Distinct)
+
+            End If
         End If
     End Sub
 
-    Private Sub TSBParentFolder_Click(sender As Object, e As EventArgs) Handles TSBParentFolder.Click
-        NavToParentFolder()
+    Private Sub TSBAddPhotosFile_Click(sender As Object, e As EventArgs) Handles TSBAddPhotosFile.Click
+
     End Sub
 
-    Private Sub NavToParentFolder()
-        'nav to parent folder
-        Dim parentDirInfo = IO.Directory.GetParent(_currentFolder)
+    Private Sub AddPhotoFiles(files As IEnumerable(Of String))
 
-        If parentDirInfo IsNot Nothing Then
-            CurrentFolder = parentDirInfo.FullName
-        End If
-    End Sub
 
-    Private Sub RefreshFilesFromFolder(pb As WaitWindow.PostBack)
-        'Enumerate all files in current folder
-        'Look for metadata cache file
-        '   If it exists, import it.
-        '   Verify filedata and filesize for each file listed.
-        '      If mismatch or missing file, delete the entry
-        '   Determine which files are emissing from metadata cache vs. folder
-        '   Pull metadate from files missing from metadate cache
-        '   Write new metadata cache file
-        '   Update listview
-
-        If IO.Directory.Exists(CurrentFolder) Then
-
+        WaitWindow.WaitForIt.DoIt("Loading photo information",
+        Sub(pb)
             Try
-                Dim files = New IO.DirectoryInfo(CurrentFolder).EnumerateFiles
-                Dim photos As List(Of Photo)
-                Dim cancelled = False
-                Dim mf = New IO.FileInfo(CurrentFolder & "\" & My.Settings.MetadataCacheFilename)
+                pb.Invoke("Enumerating files", -1)
+                Dim FileInfos = (From i In files Select New IO.FileInfo(i)).ToList
 
-                If Not mf.Exists Then
-                    photos = New List(Of Photo)
-                Else
-                    'deserialize it
-                    photos = CSVSerializer.CSVDeserializer(Of Photo).Deserialize(mf, Me, True, pb)
+                Dim count = FileInfos.Count
 
-                    'remove outdated entries
-                    '==Possible location for optimization: this is pretty slow when files are compared over a network. Maybe see if there's a way to get all of the file exists, file dates, and file sizes with as few FS accesses as possible. Right now, it's 3 FS requests per file==
-                    photos.RemoveAll(
-                        Function(i)
-                            If pb IsNot Nothing Then pb("Removing outdated photos from metadata cache.", (photos.IndexOf(i) / photos.Count))
-                            i.Path = CurrentFolder
-                            Dim fwp = i.FilenameWithPath
+                For index = 0 To count - 1
+                    pb.Invoke(String.Format("Reading file info. {0} remaining", count - index), index / count)
 
-                            If IO.File.Exists(fwp) Then
-                                Return (IO.File.GetLastWriteTime(fwp) <> i.Filedate) Or (New IO.FileInfo(fwp).Length <> i.FileSize)
-                            Else
-                                Return True
-                            End If
-                        End Function)
-
-
-
-                End If
-
-                'Get a list of files to be updated
-                Dim UpToDateFiles = (From i In photos Select i.Filename.ToUpper).ToList
-                Dim NotUpToDateFiles = (From i In files Where Not UpToDateFiles.Contains(i.Name.ToUpper)).ToList
-
-                'read info from each file and add it (if the file is supported)
-                For Each i In NotUpToDateFiles
-                    If pb IsNot Nothing Then pb(String.Format("Reading info from files. {0} remaining.", NotUpToDateFiles.Count - NotUpToDateFiles.IndexOf(i)), (NotUpToDateFiles.IndexOf(i) / NotUpToDateFiles.Count))
-
-                    Dim p = Photo.FromFile(i)
+                    Dim p = Photo.FromFile(FileInfos(index))
 
                     If p IsNot Nothing Then
-                        photos.Add(p)
+                        Dim tmp = (From i In _PhotoLVItems Where p.Filename = i.Item.Filename)
+                        Dim tmpc = tmp.Count
+
+                        If tmpc = 0 Then
+                            _PhotoLVItems.Add(New LVItem(Of Photo) With {.Item = p, .Marker = New WindowsForms.Markers.GMarkerGoogle(p.GPS, GMarkerGoogleType.blue), .LVItem = New ListViewItem({p.TakenDate, p.Lat.ToString("#.######"), p.Long.ToString("#.######")})})
+                        End If
+
                     End If
                 Next
 
-                'serialize the list and save it in the folder
-                If mf.Exists Then mf.Delete()
+                UpdateLocationPhotosLists()
+                UpdatePhotosListview()
 
-                If photos.Count <> 0 Then
-                    Dim csvData = CSVSerializer.CSVSerializer(Of Photo).Serialize(photos, pb)
-
-                    If csvData <> String.Empty Then
-
-                        Using s = mf.CreateText()
-                            s.Write(csvData)
-                            s.Flush()
-                            s.Close()
-                        End Using
-                    End If
-                End If
-
-                Me.Invoke(
-                    Sub()
-                        '-update the folder list-
-
-
-                        _PhotoLVItems = New List(Of LVItem(Of Photo))
-                        _FolderLVItems = New List(Of LVItem(Of IO.DirectoryInfo))
-
-                        'add folders to _FolderLVItems
-                        Dim folders = New IO.DirectoryInfo(CurrentFolder).EnumerateDirectories()
-
-                        For Each f In folders
-                            Dim lv As New ListViewItem(f.Name, 0)
-
-                            _FolderLVItems.Add(New LVItem(Of IO.DirectoryInfo) With {.Item = f, .LVItem = lv})
-                        Next
-
-                        'add photos to _PhotoLVItems
-                        For Each p In photos
-                            Dim subitems() As String = {p.TakenDate, p.Lat.ToString("#.######"), p.Long.ToString("#.######"), p.Filename, p.Filedate}
-                            Dim lv As New ListViewItem(subitems, 1)
-
-                            _PhotoLVItems.Add(New LVItem(Of Photo) With {.Item = p, .LVItem = lv})
-                        Next
-
-                        _PhotoLVItems.Sort(Function(a, b) Date.Compare(a.Item.TakenDate, b.Item.TakenDate))
-                        _FolderLVItems.Sort(Function(a, b) String.Compare(a.Item.Name, b.Item.Name, True))
-
-
-                        'TODO: Enable filtering
-                        UpdateListView(Of IO.DirectoryInfo)(_FolderLVItems, LVPhotos, True, Function(p) True, pb)
-                        UpdateListView(Of Photo)(_PhotoLVItems, LVPhotos, False, Function(p) True, pb)
-
-
-                        UpdateLocationPhotosLists(pb)
-
-                        'resize columns
-                        AutosizeColumns(Me.LVPhotos)
-                    End Sub)
             Catch ex As WaitWindow.DoItCanceledException
-                Me.Invoke(
-                    Sub()
-                        LVPhotos.Items.Clear()
-                        _PhotoLVItems = Nothing
-                        _FolderLVItems = Nothing
-                    End Sub)
             End Try
+        End Sub)
 
+    End Sub
+
+    Private Sub UpdatePhotosListview()
+
+        Dim a = Sub()
+                    Dim Selection = (From i In LVLocations.SelectedItems).ToList
+
+                    If Selection.Count > 0 Then
+
+                        LVPhotos.BeginUpdate()
+
+                        If Selection.Contains(_AllFilesItem) Then
+                            If Selection.Count > 1 Then
+                                'A selection in the Locations listview may contain either "(All Files)" or any combination of single or multiple locations which are not "(All Files)". If an attempt is made to select multiple and include "(All Files)", clear the selection and select only "(All Files)".
+                                LVLocations.SelectedItems.Clear()
+                                _AllFilesItem.Selected = True
+                            Else
+                                'If "(All Files)" is selected, show folders and files
+                                UpdateListView(Of Photo)(_PhotoLVItems, LVPhotos, True, Function(p) True)
+                            End If
+                        Else
+
+                            'If one or more locations are selected, show photos relevant to all of them
+
+                            If (_LocationLVItems.Count > 0) And (_PhotoLVItems.Count > 0) Then
+                                'The code in this if...then block:
+                                '   1: Get a list of the selected items in LocationsLV
+                                '   2: Convert to list of LVItem(Of Location) from _LocationLVItems (this is to get the relevant Location from each ListViewItem
+                                '   3: Get all of the photos from the list of LVItem(Of Location). The list is initially a List(Of Photo) for each  location so the result of the query is List(Of List(Of Photo)).
+                                '   4: Convert said list to a single List(Of Photo)
+                                '   5: Since a photo might belong to more than one Location, remove duplicate items using List(Of   P hoto).Distinct.ToList (we need it to still be a List(of Photo) when we're done)
+                                '   6: We need a List(Of LVItem(Of Photo)) to update the listview.
+                                '   7: Update the ListView
+
+                                'Step 1 is above where local variable Selection is defined
+
+                                'Step 2
+                                Dim SelectedLVItems = From i As ListViewItem In Selection From j In _LocationLVItems Where j.LVItem Is i Select j
+
+                                'Step 3
+                                Dim ListOfListOfPhotosFromSelectedLocations = (From i In SelectedLVItems Select i.Item.Photos).ToList
+
+                                'Step 4
+                                Dim ListOfPhotosFromSelectedLocations As New List(Of Photo)
+
+                                ListOfListOfPhotosFromSelectedLocations.ForEach(
+                                        Sub(i)
+                                            If i IsNot Nothing Then
+                                                ListOfPhotosFromSelectedLocations.AddRange(i)
+                                            End If
+                                        End Sub)
+
+                                'Step 5
+                                ListOfPhotosFromSelectedLocations = ListOfPhotosFromSelectedLocations.Distinct.ToList
+
+                                'Step 6
+                                Dim ListOfLVItemOfPhotoFromSelectedLocations = New List(Of LVItem(Of Photo))
+
+                                ListOfPhotosFromSelectedLocations.ForEach(Sub(i) ListOfLVItemOfPhotoFromSelectedLocations.Add((From j In _PhotoLVItems Where i Is j.Item).First))
+
+                                'Step 7
+                                UpdateListView(Of Photo)(ListOfLVItemOfPhotoFromSelectedLocations, LVPhotos, True, Function(i) True)
+
+                            End If
+                        End If
+
+                        LVPhotos.EndUpdate()
+                    End If
+                End Sub
+
+        If LVPhotos.InvokeRequired Then
+            LVPhotos.Invoke(a)
         Else
-            _PhotoLVItems.Clear()
-            LVPhotos.Clear()
+            a.Invoke
         End If
     End Sub
-
-    Public Property CurrentFolder As String
-        Get
-            Return _currentFolder
-        End Get
-        Set(value As String)
-            If IO.Directory.Exists(value) Then
-                _currentFolder = value
-                TBFolder.Text = value
-
-                WaitWindow.WaitForIt.DoIt("Loading folder", Sub(pb) RefreshFilesFromFolder(pb), Me)
-            End If
-        End Set
-    End Property
-
-    Private Sub TBFolder_KeyDown(sender As Object, e As KeyEventArgs) Handles TBFolder.KeyDown
-        If e.KeyCode = Keys.Enter Then
-            If IO.Directory.Exists(TBFolder.Text) Then
-                CurrentFolder = TBFolder.Text
-
-                e.Handled = True
-            End If
-        End If
-    End Sub
-
-    Private Sub LVPhotos_DoubleClick(sender As Object, e As EventArgs) Handles LVPhotos.DoubleClick
-        Dim a = LVPhotos.PointToClient(Control.MousePosition)
-
-        Dim item = LVPhotos.GetItemAt(a.X, a.Y)
-
-        If item IsNot Nothing Then
-            If item.ImageIndex = 0 Then 'there's no real easy way to tell whether the highlighted item is a folder or a photo. We need to know this to know whether we're going to search for the corresponding item in Me._PhotoLVItems or Me._FolderLVItems so we use the imageindex of the item.
-                'folder
-                Me.CurrentFolder = (From i In _FolderLVItems Where item Is i.LVItem).First.Item.FullName
-
-                'Else 'right now we have no double-click functionality for photos
-                '    'photo
-                '    Dim p = (From i In _PhotoLVItems Where item Is i.LVItem).First
-
-            End If
-        End If
-
-    End Sub
-
-    Private Sub LVPhotos_KeyDown(sender As Object, e As KeyEventArgs) Handles LVPhotos.KeyDown
-        If e.KeyCode = Keys.Back Then
-            NavToParentFolder()
-        ElseIf e.Control And (e.KeyCode = Keys.A) Then '<CTRL> + A
-            SelectAllListviewItems(LVPhotos, True)
-        End If
-    End Sub
-
-    Private Sub FMain_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-        Me.CurrentFolder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
-    End Sub
-
 
 End Class

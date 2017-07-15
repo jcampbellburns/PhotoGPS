@@ -84,6 +84,7 @@
     <Compile Include="FMain %28Locations Listview%29.vb" />
     <Compile Include="PointExtensions.vb" />
     <Compile Include="Project.vb" />
+    <Compile Include="Locations.vb" />
     <Compile Include="ToolStripCalendarDropdown.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -100,7 +101,7 @@
       <DependentUpon>FMain %28Form%29.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Locations.vb">
+    <Compile Include="FLocationEditor.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -129,8 +130,8 @@
     <EmbeddedResource Include="FMain %28Form%29.resx">
       <DependentUpon>FMain %28Form%29.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Locations.resx">
-      <DependentUpon>Locations.vb</DependentUpon>
+    <EmbeddedResource Include="FLocationEditor.resx">
+      <DependentUpon>FLocationEditor.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

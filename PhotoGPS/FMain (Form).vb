@@ -161,37 +161,30 @@ Partial Public Class FMain
     ''' Updates the <see cref="Location.Photos"/> property of all elements in <see cref="_LocationLVItems"/> which are also visible in <see cref="LVLocations"/>.
     ''' </summary>
     ''' <param name="pb"></param>
-    Private Sub UpdateLocationPhotosLists(Optional pb As WaitWindow.PostBack = Nothing)
+    Private Sub UpdateLocationPhotosLists()
         If (_LocationLVItems IsNot Nothing) And (_PhotoLVItems IsNot Nothing) Then
             If (_LocationLVItems.Count > 0) And (_PhotoLVItems.Count > 0) Then
+                Dim locations = (From i In _LocationLVItems Where (i.Item.GPS.HasValue) And (Me.LVLocations.Items.Contains(i.LVItem))).ToList
 
-                Try
+                For Each currentLoc In locations
+                    Dim tmp = (From i In _PhotoLVItems Where currentLoc.Item.ComparePhoto(i.Item) = True Select i.Item).ToList
 
-                    Dim locations = (From i In _LocationLVItems Where (i.Item.GPS.HasValue) And (Me.LVLocations.Items.Contains(i.LVItem))).ToList
+                    If tmp.Count > 0 Then
+                        currentLoc.Item.Photos = tmp
 
-                    For Each currentLoc In locations
-                        If pb IsNot Nothing Then pb.Invoke("Correlating Photos and Locations", locations.IndexOf(currentLoc) / locations.Count)
+                        tmp.ForEach(
+                        Sub(i)
+                            If i.Locations Is Nothing Then
+                                i.Locations = New List(Of Location)
+                            End If
 
-                        Dim tmp = (From i In _PhotoLVItems Where currentLoc.Item.ComparePhoto(i.Item) = True Select i.Item).ToList
+                            i.Locations.Add(currentLoc.Item)
+                        End Sub)
+                    End If
 
-                        If tmp.Count > 0 Then
-                            currentLoc.Item.Photos = tmp
+                    currentLoc.LVItem.SubItems(7).Text = currentLoc.Item.PhotoCount
+                Next
 
-                            tmp.ForEach(
-                            Sub(i)
-                                If i.Locations Is Nothing Then
-                                    i.Locations = New List(Of Location)
-                                End If
-
-                                i.Locations.Add(currentLoc.Item)
-                            End Sub)
-                        End If
-
-                        currentLoc.LVItem.SubItems(7).Text = currentLoc.Item.PhotoCount
-                    Next
-                Catch ex As WaitWindow.DoItCanceledException
-                    Throw
-                End Try
             End If
         End If
     End Sub
@@ -209,9 +202,6 @@ Partial Public Class FMain
         Stop
     End Sub
 
-
-    'Private _PhotoLVItems As List(Of LVItem(Of Photo))
-    'Private _PhotosOverlay As New WindowsForms.GMapOverlay("Photos")
 
 
 End Class

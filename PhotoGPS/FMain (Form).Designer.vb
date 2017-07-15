@@ -60,13 +60,14 @@ Partial Class FMain
         Dim ColumnHeader11 As System.Windows.Forms.ColumnHeader
         Dim ColumnHeader12 As System.Windows.Forms.ColumnHeader
         Dim ToolStrip6 As System.Windows.Forms.ToolStrip
+        Dim ToolStripButton5 As System.Windows.Forms.ToolStripSplitButton
+        Dim ToolStripButton3 As System.Windows.Forms.ToolStripSplitButton
         Dim CAPTIONgps As PhotoGPS.CaptionBarControl
         Dim TSMainTools As System.Windows.Forms.ToolStrip
         Dim ToolStripButton1 As System.Windows.Forms.ToolStripButton
         Dim ToolStripButton2 As System.Windows.Forms.ToolStripButton
         Dim STATUSMain As System.Windows.Forms.StatusStrip
         Dim ToolStripStatusLabel1 As System.Windows.Forms.ToolStripStatusLabel
-        Dim FolderBrowserDialog1 As System.Windows.Forms.FolderBrowserDialog
         Me.MAP = New GMap.NET.WindowsForms.GMapControl()
         Me.Splitter1 = New System.Windows.Forms.Splitter()
         Me.Panel1 = New System.Windows.Forms.Panel()
@@ -81,12 +82,16 @@ Partial Class FMain
         Me.TSBLocationDateFilter = New PhotoGPS.ToolStripCalendarDropdown()
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.LVPhotos = New System.Windows.Forms.ListView()
-        Me.ILFolder = New System.Windows.Forms.ImageList(Me.components)
-        Me.TSBParentFolder = New System.Windows.Forms.ToolStripButton()
-        Me.TBFolder = New PhotoGPS.ToolStripSpringTextBox()
-        Me.TSBBrowseForFolder = New System.Windows.Forms.ToolStripButton()
+        Me.RemoveSelectedPhotosToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RemovePhotosNoLongerAvailableToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
+        Me.RemoveAllPhotosToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TSBAddPhotosFolder = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TSBAddPhotosFile = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripProgressBar1 = New System.Windows.Forms.ToolStripProgressBar()
         Me.ToolStripDropDownButton1 = New System.Windows.Forms.ToolStripButton()
+        Me.FolderBrowserDialog1 = New System.Windows.Forms.FolderBrowserDialog()
+        Me.ILFolder = New System.Windows.Forms.ImageList(Me.components)
         MENUMain = New System.Windows.Forms.MenuStrip()
         FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         TestToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -123,13 +128,14 @@ Partial Class FMain
         ColumnHeader11 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ColumnHeader12 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ToolStrip6 = New System.Windows.Forms.ToolStrip()
+        ToolStripButton5 = New System.Windows.Forms.ToolStripSplitButton()
+        ToolStripButton3 = New System.Windows.Forms.ToolStripSplitButton()
         CAPTIONgps = New PhotoGPS.CaptionBarControl()
         TSMainTools = New System.Windows.Forms.ToolStrip()
         ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
         STATUSMain = New System.Windows.Forms.StatusStrip()
         ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
-        FolderBrowserDialog1 = New System.Windows.Forms.FolderBrowserDialog()
         MENUMain.SuspendLayout()
         PANELMap.SuspendLayout()
         TSAddress.SuspendLayout()
@@ -342,7 +348,6 @@ Partial Class FMain
         PANELgps.Controls.Add(Me.Splitter1)
         PANELgps.Controls.Add(Me.Panel1)
         PANELgps.Controls.Add(Me.Panel2)
-        PANELgps.Controls.Add(ToolStrip6)
         PANELgps.Controls.Add(CAPTIONgps)
         PANELgps.Dock = System.Windows.Forms.DockStyle.Left
         PANELgps.Location = New System.Drawing.Point(0, 49)
@@ -353,9 +358,9 @@ Partial Class FMain
         'Splitter1
         '
         Me.Splitter1.Dock = System.Windows.Forms.DockStyle.Right
-        Me.Splitter1.Location = New System.Drawing.Point(505, 38)
+        Me.Splitter1.Location = New System.Drawing.Point(505, 13)
         Me.Splitter1.Name = "Splitter1"
-        Me.Splitter1.Size = New System.Drawing.Size(3, 478)
+        Me.Splitter1.Size = New System.Drawing.Size(3, 503)
         Me.Splitter1.TabIndex = 5
         Me.Splitter1.TabStop = False
         '
@@ -364,9 +369,9 @@ Partial Class FMain
         Me.Panel1.Controls.Add(Me.LVLocations)
         Me.Panel1.Controls.Add(ToolStrip2)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Panel1.Location = New System.Drawing.Point(0, 38)
+        Me.Panel1.Location = New System.Drawing.Point(0, 13)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(508, 478)
+        Me.Panel1.Size = New System.Drawing.Size(508, 503)
         Me.Panel1.TabIndex = 4
         '
         'LVLocations
@@ -379,7 +384,7 @@ Partial Class FMain
         Me.LVLocations.Location = New System.Drawing.Point(0, 25)
         Me.LVLocations.Name = "LVLocations"
         Me.LVLocations.ShowGroups = False
-        Me.LVLocations.Size = New System.Drawing.Size(508, 453)
+        Me.LVLocations.Size = New System.Drawing.Size(508, 478)
         Me.LVLocations.TabIndex = 4
         Me.LVLocations.UseCompatibleStateImageBehavior = False
         Me.LVLocations.View = System.Windows.Forms.View.Details
@@ -522,10 +527,11 @@ Partial Class FMain
         'Panel2
         '
         Me.Panel2.Controls.Add(Me.LVPhotos)
+        Me.Panel2.Controls.Add(ToolStrip6)
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Right
-        Me.Panel2.Location = New System.Drawing.Point(508, 38)
+        Me.Panel2.Location = New System.Drawing.Point(508, 13)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(231, 478)
+        Me.Panel2.Size = New System.Drawing.Size(231, 503)
         Me.Panel2.TabIndex = 6
         '
         'LVPhotos
@@ -533,7 +539,7 @@ Partial Class FMain
         Me.LVPhotos.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {ColumnHeader8, ColumnHeader9, ColumnHeader10, ColumnHeader11, ColumnHeader12})
         Me.LVPhotos.Dock = System.Windows.Forms.DockStyle.Fill
         Me.LVPhotos.FullRowSelect = True
-        Me.LVPhotos.Location = New System.Drawing.Point(0, 0)
+        Me.LVPhotos.Location = New System.Drawing.Point(0, 25)
         Me.LVPhotos.Name = "LVPhotos"
         Me.LVPhotos.Size = New System.Drawing.Size(231, 478)
         Me.LVPhotos.TabIndex = 4
@@ -560,47 +566,71 @@ Partial Class FMain
         '
         ColumnHeader12.Text = "File date/time"
         '
-        'ILFolder
-        '
-        Me.ILFolder.ImageStream = CType(resources.GetObject("ILFolder.ImageStream"), System.Windows.Forms.ImageListStreamer)
-        Me.ILFolder.TransparentColor = System.Drawing.Color.Transparent
-        Me.ILFolder.Images.SetKeyName(0, "VSO_Folder_16x.png")
-        Me.ILFolder.Images.SetKeyName(1, "VSO_Document_16x.png")
-        '
         'ToolStrip6
         '
         ToolStrip6.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        ToolStrip6.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBParentFolder, Me.TBFolder, Me.TSBBrowseForFolder})
-        ToolStrip6.Location = New System.Drawing.Point(0, 13)
+        ToolStrip6.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripButton5, ToolStripButton3})
+        ToolStrip6.Location = New System.Drawing.Point(0, 0)
         ToolStrip6.Name = "ToolStrip6"
-        ToolStrip6.Size = New System.Drawing.Size(739, 25)
+        ToolStrip6.Size = New System.Drawing.Size(231, 25)
         ToolStrip6.TabIndex = 3
         '
-        'TSBParentFolder
+        'ToolStripButton5
         '
-        Me.TSBParentFolder.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.TSBParentFolder.Image = CType(resources.GetObject("TSBParentFolder.Image"), System.Drawing.Image)
-        Me.TSBParentFolder.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.TSBParentFolder.Name = "TSBParentFolder"
-        Me.TSBParentFolder.Size = New System.Drawing.Size(23, 22)
-        Me.TSBParentFolder.Text = "ToolStripButton4"
+        ToolStripButton5.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        ToolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        ToolStripButton5.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveSelectedPhotosToolStripMenuItem, Me.RemovePhotosNoLongerAvailableToolStripMenuItem, Me.ToolStripSeparator3, Me.RemoveAllPhotosToolStripMenuItem})
+        ToolStripButton5.Image = CType(resources.GetObject("ToolStripButton5.Image"), System.Drawing.Image)
+        ToolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta
+        ToolStripButton5.Name = "ToolStripButton5"
+        ToolStripButton5.Size = New System.Drawing.Size(32, 22)
+        ToolStripButton5.Text = "ToolStripButton5"
         '
-        'TBFolder
+        'RemoveSelectedPhotosToolStripMenuItem
         '
-        Me.TBFolder.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
-        Me.TBFolder.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystemDirectories
-        Me.TBFolder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TBFolder.Name = "TBFolder"
-        Me.TBFolder.Size = New System.Drawing.Size(659, 25)
+        Me.RemoveSelectedPhotosToolStripMenuItem.Name = "RemoveSelectedPhotosToolStripMenuItem"
+        Me.RemoveSelectedPhotosToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
+        Me.RemoveSelectedPhotosToolStripMenuItem.Text = "Remove selected photos"
         '
-        'TSBBrowseForFolder
+        'RemovePhotosNoLongerAvailableToolStripMenuItem
         '
-        Me.TSBBrowseForFolder.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.TSBBrowseForFolder.Image = CType(resources.GetObject("TSBBrowseForFolder.Image"), System.Drawing.Image)
-        Me.TSBBrowseForFolder.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.TSBBrowseForFolder.Name = "TSBBrowseForFolder"
-        Me.TSBBrowseForFolder.Size = New System.Drawing.Size(23, 22)
-        Me.TSBBrowseForFolder.Text = "ToolStripButton12"
+        Me.RemovePhotosNoLongerAvailableToolStripMenuItem.Name = "RemovePhotosNoLongerAvailableToolStripMenuItem"
+        Me.RemovePhotosNoLongerAvailableToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
+        Me.RemovePhotosNoLongerAvailableToolStripMenuItem.Text = "Remove photos no longer available"
+        '
+        'ToolStripSeparator3
+        '
+        Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
+        Me.ToolStripSeparator3.Size = New System.Drawing.Size(257, 6)
+        '
+        'RemoveAllPhotosToolStripMenuItem
+        '
+        Me.RemoveAllPhotosToolStripMenuItem.Name = "RemoveAllPhotosToolStripMenuItem"
+        Me.RemoveAllPhotosToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
+        Me.RemoveAllPhotosToolStripMenuItem.Text = "Remove all photos..."
+        '
+        'ToolStripButton3
+        '
+        ToolStripButton3.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        ToolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        ToolStripButton3.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBAddPhotosFolder, Me.TSBAddPhotosFile})
+        ToolStripButton3.Image = CType(resources.GetObject("ToolStripButton3.Image"), System.Drawing.Image)
+        ToolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta
+        ToolStripButton3.Name = "ToolStripButton3"
+        ToolStripButton3.Size = New System.Drawing.Size(32, 22)
+        ToolStripButton3.Text = "ToolStripButton11"
+        '
+        'TSBAddPhotosFolder
+        '
+        Me.TSBAddPhotosFolder.Name = "TSBAddPhotosFolder"
+        Me.TSBAddPhotosFolder.Size = New System.Drawing.Size(209, 22)
+        Me.TSBAddPhotosFolder.Text = "Add photos from folder..."
+        '
+        'TSBAddPhotosFile
+        '
+        Me.TSBAddPhotosFile.Name = "TSBAddPhotosFile"
+        Me.TSBAddPhotosFile.Size = New System.Drawing.Size(209, 22)
+        Me.TSBAddPhotosFile.Text = "Add photos individually..."
         '
         'CAPTIONgps
         '
@@ -674,6 +704,13 @@ Partial Class FMain
         Me.ToolStripDropDownButton1.Size = New System.Drawing.Size(23, 20)
         Me.ToolStripDropDownButton1.Text = "ToolStripDropDownButton1"
         '
+        'ILFolder
+        '
+        Me.ILFolder.ImageStream = CType(resources.GetObject("ILFolder.ImageStream"), System.Windows.Forms.ImageListStreamer)
+        Me.ILFolder.TransparentColor = System.Drawing.Color.Transparent
+        Me.ILFolder.Images.SetKeyName(0, "VSO_Folder_16x.png")
+        Me.ILFolder.Images.SetKeyName(1, "VSO_Document_16x.png")
+        '
         'FMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -706,6 +743,7 @@ Partial Class FMain
         ToolStrip2.ResumeLayout(False)
         ToolStrip2.PerformLayout()
         Me.Panel2.ResumeLayout(False)
+        Me.Panel2.PerformLayout()
         ToolStrip6.ResumeLayout(False)
         ToolStrip6.PerformLayout()
         TSMainTools.ResumeLayout(False)
@@ -720,9 +758,6 @@ Partial Class FMain
     Friend WithEvents MAP As GMap.NET.WindowsForms.GMapControl
     Friend WithEvents ILFolder As ImageList
     Friend WithEvents Panel1 As Panel
-    Friend WithEvents TSBParentFolder As ToolStripButton
-    Friend WithEvents TBFolder As ToolStripSpringTextBox
-    Friend WithEvents TSBBrowseForFolder As ToolStripButton
     Friend WithEvents Panel2 As Panel
     Friend WithEvents Splitter1 As Splitter
     Friend WithEvents TSBImportLocations As ToolStripButton
@@ -737,4 +772,11 @@ Partial Class FMain
     Friend WithEvents ToolStripProgressBar1 As ToolStripProgressBar
     Friend WithEvents ToolStripDropDownButton1 As ToolStripButton
     Friend WithEvents ColumnHeader13 As ColumnHeader
+    Friend WithEvents TSBAddPhotosFolder As ToolStripMenuItem
+    Friend WithEvents TSBAddPhotosFile As ToolStripMenuItem
+    Friend WithEvents RemoveSelectedPhotosToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents RemovePhotosNoLongerAvailableToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator3 As ToolStripSeparator
+    Friend WithEvents RemoveAllPhotosToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents FolderBrowserDialog1 As FolderBrowserDialog
 End Class

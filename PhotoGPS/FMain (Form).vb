@@ -162,8 +162,8 @@ Partial Public Class FMain
     ''' </summary>
     ''' <param name="pb"></param>
     Private Sub UpdateLocationPhotosLists()
-        If (_LocationLVItems IsNot Nothing) And (_PhotoLVItems IsNot Nothing) Then
-            If (_LocationLVItems.Count > 0) And (_PhotoLVItems.Count > 0) Then
+
+        If (_LocationLVItems.Count > 0) And (_PhotoLVItems.Count > 0) Then
                 Dim locations = (From i In _LocationLVItems Where (i.Item.GPS.HasValue) And (Me.LVLocations.Items.Contains(i.LVItem))).ToList
 
                 For Each currentLoc In locations
@@ -182,11 +182,17 @@ Partial Public Class FMain
                         End Sub)
                     End If
 
+
+                If currentLoc.LVItem.ListView.InvokeRequired Then
+                    currentLoc.LVItem.ListView.Invoke(Sub() currentLoc.LVItem.SubItems(7).Text = currentLoc.Item.PhotoCount)
+                Else
                     currentLoc.LVItem.SubItems(7).Text = currentLoc.Item.PhotoCount
-                Next
+                End If
+
+            Next
 
             End If
-        End If
+
     End Sub
 
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs)
@@ -201,7 +207,6 @@ Partial Public Class FMain
 
         Stop
     End Sub
-
 
 
 End Class

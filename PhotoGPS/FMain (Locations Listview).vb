@@ -10,6 +10,8 @@ Partial Class FMain
     Private _LocationsOverlay As New WindowsForms.GMapOverlay("Locations")
 
     Private _AllFilesItem As New ListViewItem("(All Files)")
+    Private _UnassociatedFilesItem As New ListViewItem("(No location match)")
+    Private _SpecialLocationItems As List(Of ListViewItem) = {_AllFilesItem, _UnassociatedFilesItem}.ToList
 
     Private Sub LVLocations_KeyDown(sender As Object, e As KeyEventArgs) Handles LVLocations.KeyDown
         If e.Control And (e.KeyCode = Keys.A) Then '<CTRL> + A
@@ -42,8 +44,8 @@ Partial Class FMain
                                     'do a postback for to indicate progress
                                     pb.Invoke("Updating locations list (object model)", (_LocationLVItems.Count / Locations.Count))
 
-                                    Dim subitems() As String = {l.LocationName, If(l.Start, String.Empty), If(l.End, String.Empty), l.Address, If(l.Lat, String.Empty), If(l.Long, String.Empty), l.ID, "Undefined"}
-                                    Dim lv As New ListViewItem(subitems)
+
+                                    Dim lv As New ListViewItem({l.LocationName, If(l.Start, String.Empty), If(l.End, String.Empty), l.Address, If(l.Lat.HasValue, l.Lat.ToString("0.000000"), String.Empty), If(l.Long.HasValue, l.Long.ToString("0.000000"), String.Empty), l.ID, "Undefined"})
 
                                     Dim item = New LVItem(Of Location) With {
                                                         .Item = l,
@@ -84,7 +86,11 @@ Partial Class FMain
                           Return (Not Me.TSBLocationDateFilter.FilterEnabled) Or (i.Start <= Me.TSBLocationDateFilter.FilterEnd And i.End >= Me.TSBLocationDateFilter.FilterStart)
                       End Function, pb)
 
-            LVLocations.Items.Insert(0, _AllFilesItem)
+
+            Dim q = (From i In _SpecialLocationItems Order By i.Text Descending).ToList
+            q.ForEach(Sub(i) LVLocations.Items.Insert(0, i))
+
+
             LVLocations.SelectedItems.Clear()
             _AllFilesItem.Selected = True
             AutosizeColumns(LVLocations)

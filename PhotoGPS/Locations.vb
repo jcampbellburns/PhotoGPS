@@ -71,7 +71,7 @@
 End Class
 
 Public Class Photo
-    Public Shared ReadOnly SupportedExtensions = {"*.jpg", "*.jpeg", "*.jpe"} 'Best practices is to use a constant but you can have a constant array...
+    Public Shared ReadOnly SupportedExtensions() As String = {"*.jpg", "*.jpeg", "*.jpe"} 'Best practices is to use a constant but you can't have a constant array...
 
     Public Property GPS As GMap.NET.PointLatLng
         Get
@@ -150,7 +150,11 @@ Public Class Photo
 
     Public ReadOnly Property LocationCount As Integer
         Get
-            Return Locations.Count
+            If Locations IsNot Nothing Then
+                Return Locations.Count
+            Else
+                Return 0
+            End If
         End Get
     End Property
 

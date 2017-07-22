@@ -91,7 +91,7 @@ Partial Class FMain
         Me.ToolStripProgressBar1 = New System.Windows.Forms.ToolStripProgressBar()
         Me.ToolStripDropDownButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ILFolder = New System.Windows.Forms.ImageList(Me.components)
-
+        Me.ControlEnabler1 = New PhotoGPS.ControlEnabler()
         MENUMain = New System.Windows.Forms.MenuStrip()
         FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         TestToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -716,9 +716,6 @@ Partial Class FMain
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1019, 587)
-
-
-
         Me.Controls.Add(PANELMap)
         Me.Controls.Add(SPLITTERMain)
         Me.Controls.Add(PANELgps)
@@ -781,8 +778,5 @@ Partial Class FMain
     Friend WithEvents RemovePhotosNoLongerAvailableToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator3 As ToolStripSeparator
     Friend WithEvents RemoveAllPhotosToolStripMenuItem As ToolStripMenuItem
-
-
-
-
+    Friend WithEvents ControlEnabler1 As ControlEnabler
 End Class

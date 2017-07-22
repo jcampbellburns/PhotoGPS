@@ -110,7 +110,7 @@ Partial Class FMain
                                 UpdateListView(Of Photo)(_PhotoLVItems, LVPhotos, True, Function(p) p.LocationCount = 0)
                             End If
                         End If
-                            Else
+                    Else
 
                         'If one or more locations are selected, show photos relevant to all of them
 
@@ -169,4 +169,7 @@ Partial Class FMain
         End If
     End Sub
 
+
 End Class
+
+

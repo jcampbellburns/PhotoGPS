@@ -212,4 +212,60 @@ Partial Public Class FMain
 End Class
 
 
+<ProvideProperty("zzz", GetType(Control))>
+Public Class ControlEnabler
+    Inherits Component
+    Implements IExtenderProvider
 
+    Sub New()
+
+    End Sub
+
+    'Private _controls As New List(Of KeyValuePair(Of String, Control))
+
+    <DefaultValue("")>
+    Public Function getzzz(control As Control) As String
+        'Dim a = From i In _controls Where i.Key Is control
+
+        'If a.Count = 0 Then
+        '    Return String.Empty
+        'Else
+        '    Return a.First.Key
+        'End If
+
+        Return "zzz"
+    End Function
+
+    Public Sub setzzz(control As Control, value As String)
+        'Dim a = From i In _controls Where i.Key Is control
+
+        'If a.Count <> 0 Then _controls.Remove(a.First)
+
+        'If value <> String.Empty Then _controls.Add(New KeyValuePair(Of String, Control)(value, control))
+    End Sub
+
+    'Public Sub Enable(Key As String, Optional Enabled As Boolean = True)
+    '    Dim a = (From i In _controls Where i.Key = Key Select i.Value).ToList
+
+    '    a.ForEach(Sub(i) i.Enabled = Enabled)
+    'End Sub
+
+    Public Function CanExtend(extendee As Object) As Boolean Implements IExtenderProvider.CanExtend
+        'If TypeOf extendee Is Control Then
+        '    Dim a = From i In extendee.GetType.GetProperties() Where (i.GetType Is GetType(Boolean)) And (i.Name.ToUpper = "ENABLED") And (i.CanWrite = True)
+
+        '    Return (a.Count > 0)
+
+        'Else
+        '    Return False
+        'End If
+
+        'If extendee IsNot Nothing Then
+        '    MsgBox(extendee.type)
+        'Else
+        '    MsgBox("Site is Nothing")
+        'End If
+
+        Return True
+    End Function
+End Class

@@ -77,7 +77,8 @@ Partial Class FMain
                 Next
 
                 UpdateLocationPhotosLists()
-                UpdatePhotosListview()
+                RefreshPhotos()
+
 
             Catch ex As WaitWindow.DoItCanceledException
             End Try
@@ -85,79 +86,32 @@ Partial Class FMain
 
     End Sub
 
-    Private Sub UpdatePhotosListview()
+    Private Sub RefreshPhotos()
 
         Dim a =
             Sub()
-                Dim Selection = (From i In LVLocations.SelectedItems).ToList
 
-                If Selection.Count > 0 Then
-
+                If (LVLocations.Items.Count >= Me._SpecialLocationItems.Count) And (LVLocations.SelectedItems.Count = 1) Then
                     LVPhotos.BeginUpdate()
 
-                    'If Selection.Contains(_AllFilesItem) Then
-                    If Selection.Intersect(_SpecialLocationItems).Count > 0 Then
+                    'Filtering for special location items
+                    Select Case True
+                        Case LVLocations.SelectedItems(0) Is _AllFilesItem
+                            UpdateListView(Of Photo)(_PhotoLVItems, LVPhotos, True, Function(p) True)
+                        Case LVLocations.SelectedItems(0) Is _UnassociatedFilesItem
+                            UpdateListView(Of Photo)(_PhotoLVItems, LVPhotos, True, Function(p) p.LocationCount = 0)
+                        Case LVLocations.SelectedItems(0) Is _PhotosWithMultipleLocations
+                            UpdateListView(Of Photo)(_PhotoLVItems, LVPhotos, True, Function(p) p.LocationCount > 1)
+                        Case Else
+                            Dim SelectedLocation = (From i In _LocationLVItems Where i.LVItem.Selected).First
+                            If (_LocationLVItems.Count > 0) And (_PhotoLVItems.Count > 0) Then
 
-                        If Selection.Count > 1 Then
-                            'A selection in the Locations listview may contain either "(All Files)" or any combination of single or multiple locations which are not "(All Files)". If an attempt is made to select multiple and include "(All Files)", clear the selection and select only "(All Files)".
-                            LVLocations.SelectedItems.Clear()
-                            _AllFilesItem.Selected = True
-                        Else
-                            'If "(All Files)" is selected, show folders and files
-                            If _AllFilesItem.Selected Then
-                                UpdateListView(Of Photo)(_PhotoLVItems, LVPhotos, True, Function(p) True)
-                            ElseIf _UnassociatedFilesItem.Selected Then
-                                UpdateListView(Of Photo)(_PhotoLVItems, LVPhotos, True, Function(p) p.LocationCount = 0)
+                                Dim SelectedLocationPhotosLVItems = From i In _PhotoLVItems Where i.Item.Locations.Contains(SelectedLocation.Item)
+                                UpdateListView(Of Photo)(SelectedLocationPhotosLVItems, LVPhotos, True, Function(i) True)
                             End If
-                        End If
-                    Else
-
-                        'If one or more locations are selected, show photos relevant to all of them
-
-                        If (_LocationLVItems.Count > 0) And (_PhotoLVItems.Count > 0) Then
-                            'The code in this if...then block:
-                            '   1: Get a list of the selected items in LocationsLV
-                            '   2: Convert to list of LVItem(Of Location) from _LocationLVItems (this is to get the relevant Location from each ListViewItem
-                            '   3: Get all of the photos from the list of LVItem(Of Location). The list is initially a List(Of Photo) for each location so the result of the query is List(Of List(Of Photo)).
-                            '   4: Convert said list to a single List(Of Photo)
-                            '   5: Since a photo might belong to more than one Location, remove duplicate items using List(Of Photo).Distinct.ToList (we need it to still be a List(of Photo) when we're done)
-                            '   6: We need a List(Of LVItem(Of Photo)) to update the listview.
-                            '   7: Update the ListView
-
-                            'Step 1 is above where local variable Selection is defined
-
-                            'Step 2
-                            Dim SelectedLVItems = From i As ListViewItem In Selection From j In _LocationLVItems Where j.LVItem Is i Select j
-
-                            'Step 3
-                            Dim ListOfListOfPhotosFromSelectedLocations = (From i In SelectedLVItems Select i.Item.Photos).ToList
-
-                            'Step 4
-                            Dim ListOfPhotosFromSelectedLocations As New List(Of Photo)
-
-                            ListOfListOfPhotosFromSelectedLocations.ForEach(
-                                        Sub(i)
-                                            If i IsNot Nothing Then
-                                                ListOfPhotosFromSelectedLocations.AddRange(i)
-                                            End If
-                                        End Sub)
-
-                            'Step 5
-                            ListOfPhotosFromSelectedLocations = ListOfPhotosFromSelectedLocations.Distinct.ToList
-
-                            'Step 6
-                            Dim ListOfLVItemOfPhotoFromSelectedLocations = New List(Of LVItem(Of Photo))
-
-                            ListOfPhotosFromSelectedLocations.ForEach(Sub(i) ListOfLVItemOfPhotoFromSelectedLocations.Add((From j In _PhotoLVItems Where i Is j.Item).First))
-
-                            'Step 7
-                            UpdateListView(Of Photo)(ListOfLVItemOfPhotoFromSelectedLocations, LVPhotos, True, Function(i) True)
-
-                        End If
-                    End If
+                    End Select
 
                     AutosizeColumns(LVPhotos)
-
                     LVPhotos.EndUpdate()
                 End If
             End Sub
@@ -167,8 +121,51 @@ Partial Class FMain
         Else
             a.Invoke
         End If
+
+
     End Sub
 
+    Private Sub TSBRenamePhotoFiles_Click(sender As Object, e As EventArgs) Handles TSBRenamePhotoFiles.Click
+        Dim s = (From i In _PhotoLVItems Where i.LVItem.Selected Select i.Item).ToList
+
+        If Not s.Count = 0 Then
+            WaitWindow.WaitForIt.DoIt("Renaming files",
+        Sub(pb)
+            Dim l = s.Count - 1
+            Dim i = 0I
+
+            Try
+                For i = 0 To l
+                    pb.Invoke(String.Format("Renaming files. {0} remaining.", l - i), i / l)
+                    s(i).RenameFile()
+                Next
+            Catch ex As WaitWindow.DoItCanceledException
+                MsgBox(String.Format("Canceled as requested by user. Please note only {0} of {1} files were renamed.", i, l))
+            End Try
+        End Sub, Me)
+        End If
+    End Sub
+
+    Private Sub TSBRemoveAllPhotos_Click(sender As Object, e As EventArgs) Handles TSBRemoveAllPhotos.Click
+        If MsgBox("This will remove all photos. Re-adding the photos will not restore manually associated locations. Continue?", MsgBoxStyle.Exclamation Or MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+            _PhotoLVItems.Clear()
+
+            UpdateLocationPhotosLists()
+            RefreshPhotos()
+        End If
+    End Sub
+
+    Private Sub TSBRemoveSelectedPhotos_Click(sender As Object, e As EventArgs) Handles TSBRemoveSelectedPhotos.Click
+        _PhotoLVItems.RemoveAll(Function(i) i.LVItem.Selected)
+        UpdateLocationPhotosLists()
+        RefreshPhotos()
+    End Sub
+
+    Private Sub TSBRemovePhotosNoLongerAvailable_Click(sender As Object, e As EventArgs) Handles TSBRemovePhotosNoLongerAvailable.Click
+        _PhotoLVItems.RemoveAll(Function(i) (IO.File.Exists(i.Item.Filename) = False))
+        UpdateLocationPhotosLists()
+        RefreshPhotos()
+    End Sub
 
 End Class
 

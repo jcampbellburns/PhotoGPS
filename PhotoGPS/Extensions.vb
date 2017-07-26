@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.CompilerServices
 
-Module PointExtensions
+Module PointLatLngExtensions
     <Extension()>
     Public Function DistanceTo(Start As PointLatLng, Destination As PointLatLng, Optional Units As DistanceToUnits = DistanceToUnits.Meters) As Double
         Const METERSPERKILOMETER As Integer = 1000
@@ -25,7 +25,6 @@ Module PointExtensions
                 Throw New NotImplementedException()
         End Select
     End Function
-
 
     Public Enum DistanceToUnits
         Meters = 0
@@ -326,3 +325,4 @@ Module PointExtensions
     End Function
     '======================================
 End Module
+

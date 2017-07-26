@@ -9,15 +9,11 @@ Partial Class FMain
     Private _LocationLVItems As New List(Of LVItem(Of Location))
     Private _LocationsOverlay As New WindowsForms.GMapOverlay("Locations")
 
-    Private _AllFilesItem As New ListViewItem("(All Files)")
-    Private _UnassociatedFilesItem As New ListViewItem("(No location match)")
-    Private _SpecialLocationItems As List(Of ListViewItem) = {_AllFilesItem, _UnassociatedFilesItem}.ToList
+    Private _AllFilesItem As New ListViewItem({"(All Files)", "", "", "", "", "", "", "Undefined"})
+    Private _PhotosWithMultipleLocations As New ListViewItem({"(Multiple matches)", "", "", "", "", "", "", "Undefined"})
+    Private _UnassociatedFilesItem As New ListViewItem({"(No location match)", "", "", "", "", "", "", "Undefined"})
 
-    Private Sub LVLocations_KeyDown(sender As Object, e As KeyEventArgs) Handles LVLocations.KeyDown
-        If e.Control And (e.KeyCode = Keys.A) Then '<CTRL> + A
-            SelectAllListviewItems(LVLocations, True)
-        End If
-    End Sub
+    Private _SpecialLocationItems As List(Of ListViewItem) = {_AllFilesItem, _PhotosWithMultipleLocations, _UnassociatedFilesItem}.ToList
 
     Private Sub TSBImportLocations_Click(sender As Object, e As EventArgs) Handles TSBImportLocations.Click
         'load loactions from csv
@@ -45,7 +41,7 @@ Partial Class FMain
                                     pb.Invoke("Updating locations list (object model)", (_LocationLVItems.Count / Locations.Count))
 
 
-                                    Dim lv As New ListViewItem({l.LocationName, If(l.Start, String.Empty), If(l.End, String.Empty), l.Address, If(l.Lat.HasValue, l.Lat.ToString("0.000000"), String.Empty), If(l.Long.HasValue, l.Long.ToString("0.000000"), String.Empty), l.ID, "Undefined"})
+                                    Dim lv As New ListViewItem({l.LocationName, If(l.Start, String.Empty), If(l.End, String.Empty), l.Address, If(l.Lat.HasValue, l.Lat.Value.ToString("0.000000"), String.Empty), If(l.Long.HasValue, l.Long.Value.ToString("0.000000"), String.Empty), l.ID, "Undefined"})
 
                                     Dim item = New LVItem(Of Location) With {
                                                         .Item = l,
@@ -60,7 +56,6 @@ Partial Class FMain
                                 _LocationsOverlay.IsVisibile = visibility
 
                                 RefreshLocations(pb)
-
                                 UpdateLocationPhotosLists()
 
                             Catch ex As WaitWindow.DoItCanceledException
@@ -100,8 +95,8 @@ Partial Class FMain
             LVLocations.Items.Clear()
 
             Throw
-        End Try
 
+        End Try
     End Sub
 
     Private Sub TSBLocationDateFilter_FilterUpdated(sender As Object, e As EventArgs) Handles TSBLocationDateFilter.FilterUpdated
@@ -173,16 +168,23 @@ Partial Class FMain
                             i.LVItem.SubItems(4).Text = i.Item.Lat.Value.ToString("0.000000")
                             i.LVItem.SubItems(5).Text = i.Item.[Long].Value.ToString("0.000000")
                         End Sub)
+#If DEBUG Then
                     Else
-                        Stop
+                        If status <> GeoCoderStatusCode.Unknow Then
+                            'I haven't encountered this yet. When it happens, I'll need to analyze.
+                            Stop
+                        End If
+#End If
                     End If
-
                 End Sub)
 
             Catch ex As WaitWindow.DoItCanceledException
                 'cancel was clicked by the user
             Finally
                 Me.Invoke(Sub() AutosizeColumns(LVLocations))
+
+                UpdateLocationPhotosLists()
+                RefreshPhotos()
             End Try
 
         End Sub, Me)
@@ -190,8 +192,9 @@ Partial Class FMain
     End Sub
 
     Private Sub LVLocations_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LVLocations.SelectedIndexChanged
-        UpdatePhotosListview()
+        RefreshPhotos()
     End Sub
+
 
 
 End Class

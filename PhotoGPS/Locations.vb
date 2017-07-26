@@ -158,6 +158,40 @@ Public Class Photo
         End Get
     End Property
 
-    Public Locations As List(Of Location)
+    Public Locations As New List(Of Location)
+
+    ''' <summary>
+    ''' Renames the file this <see cref="Photo"/> is associated with and updates the Creation and LastWrite dates to match <see cref="Photo.TakenDate"/>.
+    ''' </summary>
+    ''' <remarks>This method renames the file using the format "[Taken Date and Time] GPS=[Lat and Long].[Extension]. If this filename is already in use, _# is appended to the end of the name before the extension, replacing # with the lowest number which is not already in use, starting at 2.</remarks>
+    Public Sub RenameFile()
+        Dim folder = New IO.FileInfo(Me.Filename).DirectoryName
+        Dim nf As String = Me.Filename
+
+        Dim i = 1I
+        Dim exists = True 'ensure at least one filename is generated
+
+        While exists = True
+
+            Dim dup As String = If(i = 1, "", "_" & i)
+
+            nf = String.Format("{0}\{1} GPS={2}, {3}{4}{5}", folder, Me.TakenDate.ToString("yyyy-MM-dd HH.mm.ss"), Me.Lat.ToString("0.000000"), Me.Long.ToString("0.000000"), dup, New IO.FileInfo(Me.Filename).Extension)
+
+            exists = (IO.File.Exists(nf) And (nf <> Me.Filename))
+            i += 1
+        End While
+
+        If nf <> Me.Filename Then
+            Dim file = New IO.FileInfo(Me.Filename)
+            file.MoveTo(nf)
+
+            Me.Filename = nf
+        End If
+
+        IO.File.SetCreationTime(nf, TakenDate)
+        IO.File.SetLastWriteTime(nf, TakenDate)
+    End Sub
 
 End Class
+
+

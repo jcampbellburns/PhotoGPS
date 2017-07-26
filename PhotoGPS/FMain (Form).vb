@@ -160,28 +160,22 @@ Partial Public Class FMain
     ''' <summary>
     ''' Updates the <see cref="Location.Photos"/> property of all elements in <see cref="_LocationLVItems"/> which are also visible in <see cref="LVLocations"/>.
     ''' </summary>
-    ''' <param name="pb"></param>
     Private Sub UpdateLocationPhotosLists()
 
         If (_LocationLVItems.Count > 0) And (_PhotoLVItems.Count > 0) Then
-                Dim locations = (From i In _LocationLVItems Where (i.Item.GPS.HasValue) And (Me.LVLocations.Items.Contains(i.LVItem))).ToList
+            Dim locations = (From i In _LocationLVItems Where (i.Item.GPS.HasValue) And (Me.LVLocations.Items.Contains(i.LVItem))).ToList
 
-                For Each currentLoc In locations
-                    Dim tmp = (From i In _PhotoLVItems Where currentLoc.Item.ComparePhoto(i.Item) = True Select i.Item).ToList
+            For Each currentLoc In locations
+                Dim tmp = (From i In _PhotoLVItems Where currentLoc.Item.ComparePhoto(i.Item) = True Select i.Item).ToList
 
-                    If tmp.Count > 0 Then
-                        currentLoc.Item.Photos = tmp
+                If tmp.Count > 0 Then
+                    currentLoc.Item.Photos = tmp
 
-                        tmp.ForEach(
+                    tmp.ForEach(
                         Sub(i)
-                            If i.Locations Is Nothing Then
-                                i.Locations = New List(Of Location)
-                            End If
-
                             i.Locations.Add(currentLoc.Item)
                         End Sub)
-                    End If
-
+                End If
 
                 If currentLoc.LVItem.ListView.InvokeRequired Then
                     currentLoc.LVItem.ListView.Invoke(Sub() currentLoc.LVItem.SubItems(7).Text = currentLoc.Item.PhotoCount)
@@ -191,81 +185,22 @@ Partial Public Class FMain
 
             Next
 
-            End If
+        End If
+
+        Dim b = Sub()
+                    Me._AllFilesItem.SubItems(7).Text = _PhotoLVItems.Count
+                    Me._UnassociatedFilesItem.SubItems(7).Text = (From i In _PhotoLVItems Where i.Item.LocationCount = 0).Count
+                    Me._PhotosWithMultipleLocations.SubItems(7).Text = (From i In _PhotoLVItems Where i.Item.LocationCount > 1).Count
+                End Sub
+
+        If LVLocations.InvokeRequired Then
+            LVLocations.Invoke(b)
+        Else
+            b()
+        End If
+
 
     End Sub
 
-    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs)
-        'DEBUG: Starts debugger.
-        'loc has the currently highlighted location (or the first if multiple selections)
-        'photosdistances has the ALL of the photos with their distance to loc along with the result of loc.ComparePhoto
 
-        Dim loc = (From i In _LocationLVItems Where i.LVItem.Selected Select i.Item).First
-
-        Dim photosdistances = From i In _PhotoLVItems Select New With {.Photo = i, .Dist = i.Item.GPS.DistanceTo(loc.GPS.Value, DistanceToUnits.Miles), .CompareTo = loc.ComparePhoto(i.Item)}
-
-
-        Stop
-    End Sub
-
-
-End Class
-
-
-<ProvideProperty("zzz", GetType(Control))>
-Public Class ControlEnabler
-    Inherits Component
-    Implements IExtenderProvider
-
-    Sub New()
-
-    End Sub
-
-    'Private _controls As New List(Of KeyValuePair(Of String, Control))
-
-    <DefaultValue("")>
-    Public Function getzzz(control As Control) As String
-        'Dim a = From i In _controls Where i.Key Is control
-
-        'If a.Count = 0 Then
-        '    Return String.Empty
-        'Else
-        '    Return a.First.Key
-        'End If
-
-        Return "zzz"
-    End Function
-
-    Public Sub setzzz(control As Control, value As String)
-        'Dim a = From i In _controls Where i.Key Is control
-
-        'If a.Count <> 0 Then _controls.Remove(a.First)
-
-        'If value <> String.Empty Then _controls.Add(New KeyValuePair(Of String, Control)(value, control))
-    End Sub
-
-    'Public Sub Enable(Key As String, Optional Enabled As Boolean = True)
-    '    Dim a = (From i In _controls Where i.Key = Key Select i.Value).ToList
-
-    '    a.ForEach(Sub(i) i.Enabled = Enabled)
-    'End Sub
-
-    Public Function CanExtend(extendee As Object) As Boolean Implements IExtenderProvider.CanExtend
-        'If TypeOf extendee Is Control Then
-        '    Dim a = From i In extendee.GetType.GetProperties() Where (i.GetType Is GetType(Boolean)) And (i.Name.ToUpper = "ENABLED") And (i.CanWrite = True)
-
-        '    Return (a.Count > 0)
-
-        'Else
-        '    Return False
-        'End If
-
-        'If extendee IsNot Nothing Then
-        '    MsgBox(extendee.type)
-        'Else
-        '    MsgBox("Site is Nothing")
-        'End If
-
-        Return True
-    End Function
 End Class

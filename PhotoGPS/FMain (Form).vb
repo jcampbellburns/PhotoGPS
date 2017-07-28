@@ -203,4 +203,70 @@ Partial Public Class FMain
     End Sub
 
 
+    'Left off here:
+    'Todo:
+    '-Move these functions to the correct files
+    '-Replace current code for creating/updating lvitems with these functions
+    ''' <summary>
+    ''' Creates or updates a <see cref="ListViewItem"/> from a <see cref="Photo"/>.
+    ''' </summary>
+    ''' <param name="p">The <see cref="Photo"/> from which to create the <see cref="ListViewItem"/>.</param>
+    ''' <param name="lvItem">Optional. The <see cref="ListViewItem"/> to update. If not specified, a new <see cref="ListViewItem"/> is created.</param>
+    ''' <returns>Returns the <see cref="ListViewItem"/> that was updated or created.</returns>
+    ''' <remarks>The listview is created with four subitems:
+    ''' <list type="bullet">
+    ''' <item><description><see cref="Photo.TakenDate"/></description></item>
+    ''' <item><description><see cref="Photo.Lat"/> formatted to 6 digits of precision</description></item>
+    ''' <item><description><see cref="Photo.Long"/> formatted to 6 digits of precision</description></item>
+    ''' <item><description><see cref="Photo.LocationCount"/></description></item>
+    ''' </list>
+    ''' </remarks>
+    Private Function UpdatePhotoLVItem(p As Photo, Optional lvItem As ListViewItem = Nothing) As ListViewItem
+        Dim lvi = If(lvItem, New ListViewItem)
+
+        lvi.SubItems.Clear()
+        lvi.SubItems.AddRange({
+                              p.TakenDate,
+                              p.Lat.ToString("0.000000"),
+                              p.Long.ToString("0.000000"),
+                              p.LocationCount})
+
+        Return lvi
+    End Function
+
+    ''' <summary>
+    ''' Creates or updates a <see cref="ListViewItem"/> from a <see cref="Location"/>.
+    ''' </summary>
+    ''' <param name="l">The <see cref="Location"/> from which to create the <see cref="ListViewItem"/>.</param>
+    ''' <param name="lvItem">Optional. The <see cref="ListViewItem"/> to update. If not specified, a new <see cref="ListViewItem"/> is created.</param>
+    ''' <returns>Returns the <see cref="ListViewItem"/> that was updated or created.</returns>
+    ''' <remarks>The listview is created with four subitems:
+    ''' <list type="bullet">
+    ''' <item><description><see cref="Location.LocationName"/></description></item>
+    ''' <item><description><see cref="Location.Start"/> or <see cref="System.String.Empty"/> if <see cref="Location.Start"/> is null</description></item>
+    ''' <item><description><see cref="Location.End"/> or <see cref="System.String.Empty"/> if <see cref="Location.End"/> is null</description></item>
+    ''' <item><description><see cref="Location.Address"/></description></item>
+    ''' <item><description><see cref="Location.Lat"/> formatted to 6 digits of precision or <see cref="System.String.Empty"/> if <see cref="Location.Lat"/> is null</description></item>
+    ''' <item><description><see cref="Location.Long"/> formatted to 6 digits of precision or <see cref="System.String.Empty"/> if <see cref="Location.Long"/> is null</description></item>
+    ''' <item><description><see cref="Location.ID"/></description></item>
+    ''' <item><description><see cref="Location.PhotoCount"/></description></item>
+    ''' </list>
+    ''' </remarks>
+    Private Function UpdateLocationLVItem(l As Location, Optional lvItem As ListViewItem = Nothing) As ListViewItem
+        Dim lvi = If(lvItem, New ListViewItem)
+
+        lvi.SubItems.Clear()
+        lvi.SubItems.AddRange({
+                              l.LocationName,
+                              If(l.Start.HasValue, l.Start, String.Empty),
+                              If(l.End.HasValue, l.End, String.Empty),
+                              l.Address,
+                              If(l.Lat.HasValue, l.Lat.Value.ToString("0.000000"), String.Empty),
+                              If(l.Long.HasValue, l.Long.Value.ToString("0.000000"), String.Empty),
+                              l.ID,
+                              l.PhotoCount})
+
+        Return lvi
+    End Function
+
 End Class

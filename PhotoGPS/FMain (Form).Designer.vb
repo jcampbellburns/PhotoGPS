@@ -51,9 +51,6 @@ Partial Class FMain
         Dim ColumnHeader6 As System.Windows.Forms.ColumnHeader
         Dim ColumnHeader7 As System.Windows.Forms.ColumnHeader
         Dim ToolStrip2 As System.Windows.Forms.ToolStrip
-        Dim ToolStripButton4 As System.Windows.Forms.ToolStripButton
-        Dim ToolStripButton13 As System.Windows.Forms.ToolStripButton
-        Dim ToolStripButton12 As System.Windows.Forms.ToolStripButton
         Dim CaptionBarControl1 As PhotoGPS.CaptionBarControl
         Dim ColumnHeader8 As System.Windows.Forms.ColumnHeader
         Dim ColumnHeader9 As System.Windows.Forms.ColumnHeader
@@ -79,6 +76,9 @@ Partial Class FMain
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.TSBLocationsVisible = New System.Windows.Forms.ToolStripButton()
         Me.TSBGetLocationCoords = New System.Windows.Forms.ToolStripButton()
+        Me.TSBEditLocation = New System.Windows.Forms.ToolStripButton()
+        Me.TSBRemoveLocations = New System.Windows.Forms.ToolStripButton()
+        Me.TSBAddLocation = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
         Me.TSBLocationDateFilter = New PhotoGPS.ToolStripCalendarDropdown()
         Me.Panel2 = New System.Windows.Forms.Panel()
@@ -123,9 +123,6 @@ Partial Class FMain
         ColumnHeader6 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ColumnHeader7 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ToolStrip2 = New System.Windows.Forms.ToolStrip()
-        ToolStripButton4 = New System.Windows.Forms.ToolStripButton()
-        ToolStripButton13 = New System.Windows.Forms.ToolStripButton()
-        ToolStripButton12 = New System.Windows.Forms.ToolStripButton()
         CaptionBarControl1 = New PhotoGPS.CaptionBarControl()
         ColumnHeader8 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ColumnHeader9 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
@@ -433,7 +430,7 @@ Partial Class FMain
         'ToolStrip2
         '
         ToolStrip2.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBImportLocations, Me.TSBExportLocations, Me.ToolStripSeparator1, Me.TSBLocationsVisible, Me.TSBGetLocationCoords, ToolStripButton4, ToolStripButton13, ToolStripButton12, Me.ToolStripSeparator2, Me.TSBLocationDateFilter})
+        ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBImportLocations, Me.TSBExportLocations, Me.ToolStripSeparator1, Me.TSBLocationsVisible, Me.TSBGetLocationCoords, Me.TSBEditLocation, Me.TSBRemoveLocations, Me.TSBAddLocation, Me.ToolStripSeparator2, Me.TSBLocationDateFilter})
         ToolStrip2.Location = New System.Drawing.Point(0, 13)
         ToolStrip2.Name = "ToolStrip2"
         ToolStrip2.Size = New System.Drawing.Size(508, 25)
@@ -489,35 +486,35 @@ Partial Class FMain
         Me.TSBGetLocationCoords.ToolTipText = "Get GPS coordinates for all/selected locations which have an address but no GPS c" &
     "oordinates"
         '
-        'ToolStripButton4
+        'TSBEditLocation
         '
-        ToolStripButton4.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-        ToolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        ToolStripButton4.Image = CType(resources.GetObject("ToolStripButton4.Image"), System.Drawing.Image)
-        ToolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta
-        ToolStripButton4.Name = "ToolStripButton4"
-        ToolStripButton4.Size = New System.Drawing.Size(23, 22)
-        ToolStripButton4.Text = "ToolStripButton4"
+        Me.TSBEditLocation.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.TSBEditLocation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TSBEditLocation.Image = CType(resources.GetObject("TSBEditLocation.Image"), System.Drawing.Image)
+        Me.TSBEditLocation.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TSBEditLocation.Name = "TSBEditLocation"
+        Me.TSBEditLocation.Size = New System.Drawing.Size(23, 22)
+        Me.TSBEditLocation.Text = "ToolStripButton4"
         '
-        'ToolStripButton13
+        'TSBRemoveLocation
         '
-        ToolStripButton13.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-        ToolStripButton13.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        ToolStripButton13.Image = CType(resources.GetObject("ToolStripButton13.Image"), System.Drawing.Image)
-        ToolStripButton13.ImageTransparentColor = System.Drawing.Color.Magenta
-        ToolStripButton13.Name = "ToolStripButton13"
-        ToolStripButton13.Size = New System.Drawing.Size(23, 22)
-        ToolStripButton13.Text = "ToolStripButton5"
+        Me.TSBRemoveLocations.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.TSBRemoveLocations.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TSBRemoveLocations.Image = CType(resources.GetObject("TSBRemoveLocation.Image"), System.Drawing.Image)
+        Me.TSBRemoveLocations.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TSBRemoveLocations.Name = "TSBRemoveLocation"
+        Me.TSBRemoveLocations.Size = New System.Drawing.Size(23, 22)
+        Me.TSBRemoveLocations.Text = "ToolStripButton5"
         '
-        'ToolStripButton12
+        'TSBAddLocation
         '
-        ToolStripButton12.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-        ToolStripButton12.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        ToolStripButton12.Image = CType(resources.GetObject("ToolStripButton12.Image"), System.Drawing.Image)
-        ToolStripButton12.ImageTransparentColor = System.Drawing.Color.Magenta
-        ToolStripButton12.Name = "ToolStripButton12"
-        ToolStripButton12.Size = New System.Drawing.Size(23, 22)
-        ToolStripButton12.Text = "ToolStripButton11"
+        Me.TSBAddLocation.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.TSBAddLocation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TSBAddLocation.Image = CType(resources.GetObject("TSBAddLocation.Image"), System.Drawing.Image)
+        Me.TSBAddLocation.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TSBAddLocation.Name = "TSBAddLocation"
+        Me.TSBAddLocation.Size = New System.Drawing.Size(23, 22)
+        Me.TSBAddLocation.Text = "ToolStripButton11"
         '
         'ToolStripSeparator2
         '
@@ -831,6 +828,10 @@ Partial Class FMain
 
     End Sub
 
+    Protected Overrides Sub Finalize()
+        MyBase.Finalize()
+    End Sub
+
     Friend WithEvents MAP As GMap.NET.WindowsForms.GMapControl
     Friend WithEvents ILFolder As ImageList
     Friend WithEvents Panel1 As Panel
@@ -858,4 +859,7 @@ Partial Class FMain
     Friend WithEvents ToolStripButton14 As ToolStripButton
     Friend WithEvents ToolStripSeparator4 As ToolStripSeparator
     Friend WithEvents TSBRenamePhotoFiles As ToolStripButton
+    Friend WithEvents TSBEditLocation As ToolStripButton
+    Friend WithEvents TSBRemoveLocations As ToolStripButton
+    Friend WithEvents TSBAddLocation As ToolStripButton
 End Class

@@ -195,6 +195,52 @@ Partial Class FMain
         RefreshPhotos()
     End Sub
 
+    Private Sub TSBAddLocation_Click(sender As Object, e As EventArgs) Handles TSBAddLocation.Click
+        Dim a As New FLocationEditor
+
+        If a.ShowDialog(Me) = DialogResult.OK Then
+            Dim l = a.Value
+
+            Dim lv As New ListViewItem({l.LocationName, If(l.Start, String.Empty), If(l.End, String.Empty), l.Address, If(l.Lat.HasValue, l.Lat.Value.ToString("0.000000"), String.Empty), If(l.Long.HasValue, l.Long.Value.ToString("0.000000"), String.Empty), l.ID, "Undefined"})
+
+            Dim item = New LVItem(Of Location) With {
+                                                        .Item = l,
+                                                        .LVItem = lv,
+                                                        .Marker = If(l.GPS.HasValue, New WindowsForms.Markers.GMarkerGoogle(l.GPS, WindowsForms.Markers.GMarkerGoogleType.red), Nothing)}
+        End If
+    End Sub
+
+    Private Sub TSBEditLocation_Click(sender As Object, e As EventArgs) Handles TSBEditLocation.Click
+
+    End Sub
+
+    Private Sub TSBRemoveLocations_Click(sender As Object, e As EventArgs) Handles TSBRemoveLocations.Click
+        Dim a = (From i In _LocationLVItems Where i.LVItem.Selected).FirstOrDefault
+
+        If _LocationLVItems.Contains(a) Then
+            Dim selected = LVLocations.SelectedIndices(0)
+            _LocationLVItems.Remove(a)
+
+            LVLocations.BeginUpdate()
+
+            RefreshLocations()
+            UpdateLocationPhotosLists()
+
+            Dim LVItemCount As Integer = LVLocations.Items.Count - 1
+            LVLocations.SelectedIndices.Clear()
+
+            If selected <= LVItemCount Then
+                LVLocations.Items(selected).Selected = True
+                LVLocations.EnsureVisible(selected)
+            Else
+                LVLocations.Items(LVItemCount).Selected = True
+                LVLocations.EnsureVisible(LVItemCount)
+            End If
+
+            LVLocations.EndUpdate()
+        End If
+
+    End Sub
 
 
 End Class

@@ -47,6 +47,12 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>true</DelaySign>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ExifLib">
       <HintPath>..\lib\ExifLib.dll</HintPath>
@@ -85,6 +91,9 @@
   <ItemGroup>
     <Compile Include="CaptionBarControl.vb">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FLocationEditor.Designer.vb">
+      <DependentUpon>FLocationEditor.vb</DependentUpon>
     </Compile>
     <Compile Include="FMain %28Photos Listview%29.vb" />
     <Compile Include="FMain %28Locations Listview%29.vb" />

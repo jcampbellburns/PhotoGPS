@@ -40,8 +40,7 @@ Partial Class FMain
                                     'do a postback for to indicate progress
                                     pb.Invoke("Updating locations list (object model)", (_LocationLVItems.Count / Locations.Count))
 
-
-                                    Dim lv As New ListViewItem({l.LocationName, If(l.Start, String.Empty), If(l.End, String.Empty), l.Address, If(l.Lat.HasValue, l.Lat.Value.ToString("0.000000"), String.Empty), If(l.Long.HasValue, l.Long.Value.ToString("0.000000"), String.Empty), l.ID, "Undefined"})
+                                    Dim lv = UpdateLocationLVItem(l)
 
                                     Dim item = New LVItem(Of Location) With {
                                                         .Item = l,
@@ -145,12 +144,12 @@ Partial Class FMain
 
     Private Sub TSBGetLocationCoords_Click(sender As Object, e As EventArgs) Handles TSBGetLocationCoords.Click
 
-        WaitWindow.WaitForIt.DoIt("Retreiving GPS coordinates for selected locations",
+        WaitWindow.WaitForIt.DoIt("Retreiving GPS coordinates for locations without GPS",
         Sub(pb)
             Try
                 Dim a As List(Of LVItem(Of Location)) = Nothing
 
-                Me.Invoke(Sub() a = (From i In _LocationLVItems Where (Me.LVLocations.Items.Contains(i.LVItem)) And (i.LVItem.Selected = True) And (i.Item.GPS.HasValue = False) And (String.IsNullOrWhiteSpace(i.Item.Address) = False)).ToList)
+                Me.Invoke(Sub() a = (From i In _LocationLVItems Where (Me.LVLocations.Items.Contains(i.LVItem)) And (i.Item.GPS.HasValue = False) And (String.IsNullOrWhiteSpace(i.Item.Address) = False)).ToList)
 
                 a.ForEach(
                 Sub(i)
@@ -163,11 +162,7 @@ Partial Class FMain
                     i.Item.GPS = MapProviders.GMapProviders.GoogleMap.GetPoint(i.Item.Address, status)
 
                     If i.Item.GPS.HasValue Then
-                        Me.Invoke(
-                        Sub()
-                            i.LVItem.SubItems(4).Text = i.Item.Lat.Value.ToString("0.000000")
-                            i.LVItem.SubItems(5).Text = i.Item.[Long].Value.ToString("0.000000")
-                        End Sub)
+                        Me.Invoke(Sub() UpdateLocationLVItem(i.Item, i.LVItem))
 #If DEBUG Then
                     Else
                         If status <> GeoCoderStatusCode.Unknow Then
@@ -196,18 +191,13 @@ Partial Class FMain
     End Sub
 
     Private Sub TSBAddLocation_Click(sender As Object, e As EventArgs) Handles TSBAddLocation.Click
-        Dim a As New FLocationEditor
+        'Dim a As New FLocationEditor
 
-        If a.ShowDialog(Me) = DialogResult.OK Then
-            Dim l = a.Value
+        'If a.ShowDialog(Me) = DialogResult.OK Then
+        '    Dim l = a.Value
 
-            Dim lv As New ListViewItem({l.LocationName, If(l.Start, String.Empty), If(l.End, String.Empty), l.Address, If(l.Lat.HasValue, l.Lat.Value.ToString("0.000000"), String.Empty), If(l.Long.HasValue, l.Long.Value.ToString("0.000000"), String.Empty), l.ID, "Undefined"})
-
-            Dim item = New LVItem(Of Location) With {
-                                                        .Item = l,
-                                                        .LVItem = lv,
-                                                        .Marker = If(l.GPS.HasValue, New WindowsForms.Markers.GMarkerGoogle(l.GPS, WindowsForms.Markers.GMarkerGoogleType.red), Nothing)}
-        End If
+        '    Dim lv = Me.UpdateLocationLVItem(a.Value)
+        'End If
     End Sub
 
     Private Sub TSBEditLocation_Click(sender As Object, e As EventArgs) Handles TSBEditLocation.Click
@@ -242,5 +232,39 @@ Partial Class FMain
 
     End Sub
 
+    ''' <summary>
+    ''' Creates or updates a <see cref="ListViewItem"/> from a <see cref="Location"/>.
+    ''' </summary>
+    ''' <param name="l">The <see cref="Location"/> from which to create the <see cref="ListViewItem"/>.</param>
+    ''' <param name="lvItem">Optional. The <see cref="ListViewItem"/> to update. If not specified, a new <see cref="ListViewItem"/> is created.</param>
+    ''' <returns>Returns the <see cref="ListViewItem"/> that was updated or created.</returns>
+    ''' <remarks>The listview is created with four subitems:
+    ''' <list type="bullet">
+    ''' <item><description><see cref="Location.LocationName"/></description></item>
+    ''' <item><description><see cref="Location.Start"/> or <see cref="System.String.Empty"/> if <see cref="Location.Start"/> is null</description></item>
+    ''' <item><description><see cref="Location.End"/> or <see cref="System.String.Empty"/> if <see cref="Location.End"/> is null</description></item>
+    ''' <item><description><see cref="Location.Address"/></description></item>
+    ''' <item><description><see cref="Location.Lat"/> formatted to 6 digits of precision or <see cref="System.String.Empty"/> if <see cref="Location.Lat"/> is null</description></item>
+    ''' <item><description><see cref="Location.Long"/> formatted to 6 digits of precision or <see cref="System.String.Empty"/> if <see cref="Location.Long"/> is null</description></item>
+    ''' <item><description><see cref="Location.ID"/></description></item>
+    ''' <item><description><see cref="Location.PhotoCount"/></description></item>
+    ''' </list>
+    ''' </remarks>
+    Private Function UpdateLocationLVItem(l As Location, Optional lvItem As ListViewItem = Nothing) As ListViewItem
+        Dim lvi = If(lvItem, New ListViewItem)
+
+        lvi.SubItems.Clear()
+        lvi.SubItems.AddRange({
+                              l.LocationName,
+                              If(l.Start.HasValue, l.Start, String.Empty),
+                              If(l.End.HasValue, l.End, String.Empty),
+                              l.Address,
+                              If(l.Lat.HasValue, l.Lat.Value.ToString("0.000000"), String.Empty),
+                              If(l.Long.HasValue, l.Long.Value.ToString("0.000000"), String.Empty),
+                              l.ID,
+                              l.PhotoCount})
+
+        Return lvi
+    End Function
 
 End Class

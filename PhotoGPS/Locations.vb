@@ -114,11 +114,16 @@ Public Class Photo
                         res = New Photo With {
                             .Filedate = File.LastWriteTime,
                             .FileSize = File.Length,
-                            .Filename = File.FullName,
-                            .Lat = If(HasGPS, If(latitudeRef = "N", 1, -1) * (latitudeDMS(0) + (latitudeDMS(1) / 60) + (latitudeDMS(2) / 3600)), New Double?),
-                            .Long = If(HasGPS, If(longitudeRef = "E", 1, -1) * (longitudeDMS(0) + (longitudeDMS(1) / 60) + (longitudeDMS(2) / 3600)), New Double?)}
+                            .Filename = File.FullName}
 
-                        res.TakenDate = If(HasTakenDate, takenDate, New Date?)
+                        If HasGPS Then
+                            res.Lat = If(latitudeRef = "N", 1, -1) * (latitudeDMS(0) + (latitudeDMS(1) / 60) + (latitudeDMS(2) / 3600))
+                            res.Long = If(longitudeRef = "E", 1, -1) * (longitudeDMS(0) + (longitudeDMS(1) / 60) + (longitudeDMS(2) / 3600))
+                        End If
+
+                        If HasTakenDate Then
+                            res.TakenDate = takenDate
+                        End If
 
                         If (HasGPS = False) Or (HasTakenDate = False) Then
                             'I want only photos that have gps and a taken date. If either are missing, don't do anything with the image.

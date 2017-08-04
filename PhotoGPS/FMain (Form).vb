@@ -31,52 +31,6 @@ Partial Public Class FMain
     End Sub
 
     ''' <summary>
-    ''' Selects or deselects all items in a <see cref="ListView"/> control.
-    ''' </summary>
-    ''' <param name="lv">The <see cref="ListView"/> control in which to select or deslect all items.</param>
-    ''' <param name="selectionState">If <c>True</c>, all items will be selected. If <c>False</c>, all items will be deslected.</param>
-    ''' <remarks>This function will create a <c>WaitWindow</c> using the method <see cref="WaitWindow.WaitForIt.DoIt(String, Action(Of WaitWindow.PostBack), Form, WaitWindow.PostBack)"/>. <c>Cancel</c> results in a partial selection.</remarks>
-    Private Shared Sub SelectAllListviewItems(lv As ListView, selectionState As Boolean)
-        'There's no method nor a Windows message you can send to a Listview to select all items so we'll have to iterate through the items one at a time and select them. This takes time so we'll use a wait window if it's more than 1000 items.
-
-        'Populate .Items to a List(Of ListViewItem) then iterate through that seems to be much quicker for some reason.
-        Dim lvitems = (From i As ListViewItem In lv.Items).ToList
-
-        Dim SelectionFunction =
-            Sub(pb As WaitWindow.PostBack)
-                Try
-                    lv.BeginUpdate()
-
-                    'Not sure why, but this is SLOW
-                    'For Each i In LVLocations.Items
-                    '    i.Selected = True
-                    '    pb("Selecting all.", (LVLocations.Items.IndexOf(i) / (LVLocations.Items.Count)))
-                    'Next
-
-                    For Each i In lvitems
-                        i.Selected = selectionState
-                        If pb IsNot Nothing Then pb("Selecting all.", (lvitems.IndexOf(i) / (lvitems.Count)))
-                    Next
-
-                Catch ex As WaitWindow.DoItCanceledException
-                    'User clicked cancel. In this case, we'll leave the user a partial selection
-                Finally
-                    lv.EndUpdate()
-                End Try
-            End Sub
-
-        If lvitems.Count > 1000 Then
-            'asynchronously with a progress bar and a Cancel button
-            WaitWindow.WaitForIt.DoIt("User Interface", Sub(pb) lv.Invoke(Sub() SelectionFunction(pb)), lv.FindForm)
-        Else
-            'syncronously, locks up UI
-            SelectionFunction(Nothing)
-        End If
-
-
-    End Sub
-
-    ''' <summary>
     ''' Updates a <see cref="ListView"/> control to contain items from a <see cref="List(Of LVItem)"/>, optionally allowing filtering.
     ''' </summary>
     ''' <typeparam name="T">The type of the base object being displayed.</typeparam>
@@ -178,9 +132,9 @@ Partial Public Class FMain
                 End If
 
                 If currentLoc.LVItem.ListView.InvokeRequired Then
-                    currentLoc.LVItem.ListView.Invoke(Sub() currentLoc.LVItem.SubItems(7).Text = currentLoc.Item.PhotoCount)
+                    currentLoc.LVItem.ListView.Invoke(Sub() UpdateLocationLVItem(currentLoc.Item, currentLoc.LVItem))
                 Else
-                    currentLoc.LVItem.SubItems(7).Text = currentLoc.Item.PhotoCount
+                    UpdateLocationLVItem(currentLoc.Item, currentLoc.LVItem)
                 End If
 
             Next
@@ -201,72 +155,5 @@ Partial Public Class FMain
 
 
     End Sub
-
-
-    'Left off here:
-    'Todo:
-    '-Move these functions to the correct files
-    '-Replace current code for creating/updating lvitems with these functions
-    ''' <summary>
-    ''' Creates or updates a <see cref="ListViewItem"/> from a <see cref="Photo"/>.
-    ''' </summary>
-    ''' <param name="p">The <see cref="Photo"/> from which to create the <see cref="ListViewItem"/>.</param>
-    ''' <param name="lvItem">Optional. The <see cref="ListViewItem"/> to update. If not specified, a new <see cref="ListViewItem"/> is created.</param>
-    ''' <returns>Returns the <see cref="ListViewItem"/> that was updated or created.</returns>
-    ''' <remarks>The listview is created with four subitems:
-    ''' <list type="bullet">
-    ''' <item><description><see cref="Photo.TakenDate"/></description></item>
-    ''' <item><description><see cref="Photo.Lat"/> formatted to 6 digits of precision</description></item>
-    ''' <item><description><see cref="Photo.Long"/> formatted to 6 digits of precision</description></item>
-    ''' <item><description><see cref="Photo.LocationCount"/></description></item>
-    ''' </list>
-    ''' </remarks>
-    Private Function UpdatePhotoLVItem(p As Photo, Optional lvItem As ListViewItem = Nothing) As ListViewItem
-        Dim lvi = If(lvItem, New ListViewItem)
-
-        lvi.SubItems.Clear()
-        lvi.SubItems.AddRange({
-                              p.TakenDate,
-                              p.Lat.ToString("0.000000"),
-                              p.Long.ToString("0.000000"),
-                              p.LocationCount})
-
-        Return lvi
-    End Function
-
-    ''' <summary>
-    ''' Creates or updates a <see cref="ListViewItem"/> from a <see cref="Location"/>.
-    ''' </summary>
-    ''' <param name="l">The <see cref="Location"/> from which to create the <see cref="ListViewItem"/>.</param>
-    ''' <param name="lvItem">Optional. The <see cref="ListViewItem"/> to update. If not specified, a new <see cref="ListViewItem"/> is created.</param>
-    ''' <returns>Returns the <see cref="ListViewItem"/> that was updated or created.</returns>
-    ''' <remarks>The listview is created with four subitems:
-    ''' <list type="bullet">
-    ''' <item><description><see cref="Location.LocationName"/></description></item>
-    ''' <item><description><see cref="Location.Start"/> or <see cref="System.String.Empty"/> if <see cref="Location.Start"/> is null</description></item>
-    ''' <item><description><see cref="Location.End"/> or <see cref="System.String.Empty"/> if <see cref="Location.End"/> is null</description></item>
-    ''' <item><description><see cref="Location.Address"/></description></item>
-    ''' <item><description><see cref="Location.Lat"/> formatted to 6 digits of precision or <see cref="System.String.Empty"/> if <see cref="Location.Lat"/> is null</description></item>
-    ''' <item><description><see cref="Location.Long"/> formatted to 6 digits of precision or <see cref="System.String.Empty"/> if <see cref="Location.Long"/> is null</description></item>
-    ''' <item><description><see cref="Location.ID"/></description></item>
-    ''' <item><description><see cref="Location.PhotoCount"/></description></item>
-    ''' </list>
-    ''' </remarks>
-    Private Function UpdateLocationLVItem(l As Location, Optional lvItem As ListViewItem = Nothing) As ListViewItem
-        Dim lvi = If(lvItem, New ListViewItem)
-
-        lvi.SubItems.Clear()
-        lvi.SubItems.AddRange({
-                              l.LocationName,
-                              If(l.Start.HasValue, l.Start, String.Empty),
-                              If(l.End.HasValue, l.End, String.Empty),
-                              l.Address,
-                              If(l.Lat.HasValue, l.Lat.Value.ToString("0.000000"), String.Empty),
-                              If(l.Long.HasValue, l.Long.Value.ToString("0.000000"), String.Empty),
-                              l.ID,
-                              l.PhotoCount})
-
-        Return lvi
-    End Function
 
 End Class

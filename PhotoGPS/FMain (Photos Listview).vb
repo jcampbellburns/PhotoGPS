@@ -70,7 +70,7 @@ Partial Class FMain
                         Dim tmpc = tmp.Count
 
                         If tmpc = 0 Then
-                            _PhotoLVItems.Add(New LVItem(Of Photo) With {.Item = p, .Marker = New WindowsForms.Markers.GMarkerGoogle(p.GPS, GMarkerGoogleType.blue), .LVItem = New ListViewItem({p.TakenDate, p.Lat.ToString("0.000000"), p.Long.ToString("0.000000")})})
+                            _PhotoLVItems.Add(New LVItem(Of Photo) With {.Item = p, .Marker = New WindowsForms.Markers.GMarkerGoogle(p.GPS, GMarkerGoogleType.blue), .LVItem = Me.UpdatePhotoLVItem(p)})
                         End If
 
                     End If
@@ -166,6 +166,33 @@ Partial Class FMain
         UpdateLocationPhotosLists()
         RefreshPhotos()
     End Sub
+
+    ''' <summary>
+    ''' Creates or updates a <see cref="ListViewItem"/> from a <see cref="Photo"/>.
+    ''' </summary>
+    ''' <param name="p">The <see cref="Photo"/> from which to create the <see cref="ListViewItem"/>.</param>
+    ''' <param name="lvItem">Optional. The <see cref="ListViewItem"/> to update. If not specified, a new <see cref="ListViewItem"/> is created.</param>
+    ''' <returns>Returns the <see cref="ListViewItem"/> that was updated or created.</returns>
+    ''' <remarks>The listview is created with four subitems:
+    ''' <list type="bullet">
+    ''' <item><description><see cref="Photo.TakenDate"/></description></item>
+    ''' <item><description><see cref="Photo.Lat"/> formatted to 6 digits of precision</description></item>
+    ''' <item><description><see cref="Photo.Long"/> formatted to 6 digits of precision</description></item>
+    ''' <item><description><see cref="Photo.LocationCount"/></description></item>
+    ''' </list>
+    ''' </remarks>
+    Private Function UpdatePhotoLVItem(p As Photo, Optional lvItem As ListViewItem = Nothing) As ListViewItem
+        Dim lvi = If(lvItem, New ListViewItem)
+
+        lvi.SubItems.Clear()
+        lvi.SubItems.AddRange({
+                              p.TakenDate,
+                              p.Lat.ToString("0.000000"),
+                              p.Long.ToString("0.000000"),
+                              p.LocationCount})
+
+        Return lvi
+    End Function
 
 End Class
 

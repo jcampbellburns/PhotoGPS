@@ -89,34 +89,29 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CaptionBarControl.vb">
+    <Compile Include="Controls\CaptionBarControl.vb">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="FLocationEditor.Designer.vb">
+    <Compile Include="Object Model\Photo.vb" />
+    <Compile Include="Forms\FLocationEditor.Designer.vb">
       <DependentUpon>FLocationEditor.vb</DependentUpon>
     </Compile>
-    <Compile Include="FMain %28Photos Listview%29.vb" />
-    <Compile Include="FMain %28Locations Listview%29.vb" />
-    <Compile Include="Extensions.vb" />
-    <Compile Include="Project.vb" />
-    <Compile Include="Locations.vb" />
-    <Compile Include="ToolStripCalendarDropdown.vb">
+    <Compile Include="Forms\FMain %28Photos Listview%29.vb" />
+    <Compile Include="Forms\FMain %28Locations Listview%29.vb" />
+    <Compile Include="Object Model\Extensions.vb" />
+    <Compile Include="Object Model\Project.vb" />
+    <Compile Include="Object Model\Location.vb" />
+    <Compile Include="Controls\ToolStripCalendarDropdown.vb">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CSVDeserializer.Designer.vb">
-      <DependentUpon>CSVDeserializer.vb</DependentUpon>
-    </Compile>
-    <Compile Include="CSVDeserializer.vb">
+    <Compile Include="Forms\FMain %28Form%29.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FMain %28Form%29.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FMain %28Form%29.Designer.vb">
+    <Compile Include="Forms\FMain %28Form%29.Designer.vb">
       <DependentUpon>FMain %28Form%29.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FLocationEditor.vb">
+    <Compile Include="Forms\FLocationEditor.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -134,18 +129,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="ToolStripSpringTextbox.vb">
+    <Compile Include="Controls\ToolStripSpringTextbox.vb">
       <SubType>Component</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CSVDeserializer.resx">
-      <DependentUpon>CSVDeserializer.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FMain %28Form%29.resx">
+    <EmbeddedResource Include="Forms\FMain %28Form%29.resx">
       <DependentUpon>FMain %28Form%29.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FLocationEditor.resx">
+    <EmbeddedResource Include="Forms\FLocationEditor.resx">
       <DependentUpon>FLocationEditor.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -178,5 +170,6 @@
       <Name>WaitWindow</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

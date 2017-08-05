@@ -59,13 +59,13 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FFieldMapping.Designer.vb">
-      <DependentUpon>FFieldMapping.vb</DependentUpon>
+    <Compile Include="Field Mapping Window.Designer.vb">
+      <DependentUpon>Field Mapping Window.vb</DependentUpon>
     </Compile>
-    <Compile Include="FFieldMapping.vb">
+    <Compile Include="Field Mapping Window.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CVSSerializer.vb" />
+    <Compile Include="CVS Serializer Classes.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -83,8 +83,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="FFieldMapping.resx">
-      <DependentUpon>FFieldMapping.vb</DependentUpon>
+    <EmbeddedResource Include="Field Mapping Window.resx">
+      <DependentUpon>Field Mapping Window.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

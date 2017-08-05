@@ -1,6 +1,4 @@
-﻿
-
-Partial Public Class FMain
+﻿Partial Public Class FMain
 
     Sub New()
 
@@ -91,16 +89,6 @@ Partial Public Class FMain
 
     End Sub
     ''' <summary>
-    ''' This structure is used to correlate a <see cref="ListViewItem"/>, a <see cref="WindowsForms.GMapMarker"/>, and an object of type <c>T</c>. To be used with a <see cref="List(Of T)"/> and Linq queries.
-    ''' </summary>
-    ''' <typeparam name="t">The type of object to correlate with the <see cref="ListViewItem"/> and <see cref="WindowsForms.GMapMarker"/></typeparam>
-    Private Structure LVItem(Of t)
-        Public Item As t
-        Public LVItem As ListViewItem
-        Public Marker As WindowsForms.GMapMarker
-    End Structure
-
-    ''' <summary>
     ''' Resize all of the columns in a <see cref="ListView"/> to fit the current content.
     ''' </summary>
     ''' <param name="lv">The <see cref="ListView"/> to resize the columns of.</param>
@@ -114,46 +102,104 @@ Partial Public Class FMain
     ''' <summary>
     ''' Updates the <see cref="Location.Photos"/> property of all elements in <see cref="_LocationLVItems"/> which are also visible in <see cref="LVLocations"/>.
     ''' </summary>
-    Private Sub UpdateLocationPhotosLists()
+    ''' <param name="pb">Optional. If provided, this method will call it to update the user. If not specified, this method will establish a <see cref="WaitWindow.WaitForIt"/> on it's own.</param>
+    Private Sub UpdateLocationPhotosLists(Optional pb As WaitWindow.PostBack = Nothing)
+        'initialize lists sub
+        Dim InitializeLists =
+            Sub()
+                If (_LocationLVItems.Count > 0) Then
+                    _LocationLVItems.ForEach(Sub(i)
+                                                 If i.Item.Photos IsNot Nothing Then
+                                                     i.Item.Photos.Clear()
+                                                 End If
+                                             End Sub)
 
-        If (_LocationLVItems.Count > 0) And (_PhotoLVItems.Count > 0) Then
-            Dim locations = (From i In _LocationLVItems Where (i.Item.GPS.HasValue) And (Me.LVLocations.Items.Contains(i.LVItem))).ToList
-
-            For Each currentLoc In locations
-                Dim tmp = (From i In _PhotoLVItems Where currentLoc.Item.ComparePhoto(i.Item) = True Select i.Item).ToList
-
-                If tmp.Count > 0 Then
-                    currentLoc.Item.Photos = tmp
-
-                    tmp.ForEach(
-                        Sub(i)
-                            i.Locations.Add(currentLoc.Item)
-                        End Sub)
                 End If
 
-                If currentLoc.LVItem.ListView.InvokeRequired Then
-                    currentLoc.LVItem.ListView.Invoke(Sub() UpdateLocationLVItem(currentLoc.Item, currentLoc.LVItem))
-                Else
-                    UpdateLocationLVItem(currentLoc.Item, currentLoc.LVItem)
+                If (_PhotoLVItems.Count > 0) Then
+                    _PhotoLVItems.ForEach(Sub(i)
+                                              If i.Item.Locations IsNot Nothing Then
+                                                  i.Item.Locations.Clear()
+                                              End If
+                                          End Sub)
                 End If
+            End Sub
 
-            Next
+        'update special items sub
+        Dim UpdateSpecialItems =
+            Sub()
+                Me._AllFilesItem.SubItems(7).Text = _PhotoLVItems.Count
+                Me._UnassociatedFilesItem.SubItems(7).Text = (From i In _PhotoLVItems Where i.Item.LocationCount = 0).Count
+                Me._PhotosWithMultipleLocations.SubItems(7).Text = (From i In _PhotoLVItems Where i.Item.LocationCount > 1).Count
+            End Sub
 
-        End If
+        'correlation function sub
+        Dim RunCorrelation =
+            Sub(postback As WaitWindow.PostBack, ThrowException As Boolean)
+                InitializeLists()
 
-        Dim b = Sub()
-                    Me._AllFilesItem.SubItems(7).Text = _PhotoLVItems.Count
-                    Me._UnassociatedFilesItem.SubItems(7).Text = (From i In _PhotoLVItems Where i.Item.LocationCount = 0).Count
-                    Me._PhotosWithMultipleLocations.SubItems(7).Text = (From i In _PhotoLVItems Where i.Item.LocationCount > 1).Count
-                End Sub
+                Try
+                    If (_LocationLVItems.Count > 0) And (_PhotoLVItems.Count > 0) Then
+                        Dim locations = (From i In _LocationLVItems Where (i.Item.GPS.HasValue) And (Me.LVLocations.Items.Contains(i.LVItem))).ToList
 
-        If LVLocations.InvokeRequired Then
-            LVLocations.Invoke(b)
+                        For Each currentLoc In locations
+                            postback.Invoke("Finding photos which match location " & currentLoc.Item.LocationName, locations.IndexOf(currentLoc) / locations.Count)
+                            Dim tmp = (From i In _PhotoLVItems Where currentLoc.Item.ComparePhoto(i.Item) = True).ToList
+
+                            If tmp.Count > 0 Then
+                                currentLoc.Item.Photos = (From i In tmp Select i.Item).ToList
+
+                                tmp.ForEach(Sub(i)
+                                                'add the current Location to each of this Location's photos' Locations list
+                                                i.Item.Locations.Add(currentLoc.Item)
+
+
+                                                'If a photo has 2 or more Locations, color it red in the listview
+                                                If i.Item.LocationCount > 1 Then
+                                                    i.LVItem.ForeColor = Color.Red
+                                                Else
+                                                    i.LVItem.ForeColor = i.LVItem.ListView.ForeColor
+                                                End If
+                                            End Sub)
+                            End If
+
+                            If currentLoc.LVItem.ListView.InvokeRequired Then
+                                currentLoc.LVItem.ListView.Invoke(Sub() UpdateLocationLVItem(currentLoc.Item, currentLoc.LVItem))
+                            Else
+                                UpdateLocationLVItem(currentLoc.Item, currentLoc.LVItem)
+                            End If
+
+                        Next
+
+                    End If
+                Catch ex As WaitWindow.DoItCanceledException
+                    'if the user cancels, we do not want a partial correlation so clear it
+                    InitializeLists()
+                    If ThrowException Then Throw 'we put this in since if pb is passed from an existing WaitWindow, we want to propigate the cancelled exception. If pb was created for this call, we don't want to propigate the exception any further than this sub (UpdateLocationPhotosLists) as the code would not be expecting it.
+                Finally
+                    If LVLocations.InvokeRequired Then
+                        LVLocations.Invoke(UpdateSpecialItems)
+                    Else
+                        UpdateSpecialItems()
+                    End If
+                End Try
+            End Sub
+
+        'initialize waitwindow if needed
+        If pb Is Nothing Then
+            WaitWindow.WaitForIt.DoIt("Correlating locations and photos", Sub(p) RunCorrelation(p, False), Me)
         Else
-            b()
+            RunCorrelation(pb, True)
         End If
-
-
     End Sub
 
+    ''' <summary>
+    ''' This structure is used to correlate a <see cref="ListViewItem"/>, a <see cref="WindowsForms.GMapMarker"/>, and an object of type <c>T</c>. To be used with a <see cref="List(Of T)"/> and Linq queries.
+    ''' </summary>
+    ''' <typeparam name="t">The type of object to correlate with the <see cref="ListViewItem"/> and <see cref="WindowsForms.GMapMarker"/></typeparam>
+    Private Structure LVItem(Of t)
+        Public Item As t
+        Public LVItem As ListViewItem
+        Public Marker As WindowsForms.GMapMarker
+    End Structure
 End Class

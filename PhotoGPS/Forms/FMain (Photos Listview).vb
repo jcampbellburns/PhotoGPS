@@ -76,7 +76,7 @@ Partial Class FMain
                     End If
                 Next
 
-                UpdateLocationPhotosLists()
+                UpdateLocationPhotosLists(pb)
                 RefreshPhotos()
 
 
@@ -185,11 +185,12 @@ Partial Class FMain
         Dim lvi = If(lvItem, New ListViewItem)
 
         lvi.SubItems.Clear()
+        lvi.Text = p.TakenDate
         lvi.SubItems.AddRange({
-                              p.TakenDate,
                               p.Lat.ToString("0.000000"),
                               p.Long.ToString("0.000000"),
                               p.LocationCount})
+
 
         Return lvi
     End Function

@@ -15,59 +15,55 @@ Partial Class FMain
 
     Private _SpecialLocationItems As List(Of ListViewItem) = {_AllFilesItem, _PhotosWithMultipleLocations, _UnassociatedFilesItem}.ToList
 
-    Private Sub TSBImportLocations_Click(sender As Object, e As EventArgs) Handles TSBImportLocations.Click
-        'load loactions from csv
-        Dim Locations As List(Of Location)
 
-        WaitWindow.WaitForIt.DoIt("Importing Locations",
-            Sub(pb)
-                Locations = CSVSerializer.CSVDeserializer(Of Location).Deserialize(Me, False, pb)
+    Private Sub AddLocations(Locations As List(Of Location), pb As WaitWindow.PostBack)
+        If Locations IsNot Nothing Then
+            Me.Invoke(
+                Sub()
+                    Try
+                        'Initialize location lists (LVItems, and markers)
+                        _LocationLVItems.Clear()
+                        _LocationsOverlay.Markers.Clear()
 
-                If Locations IsNot Nothing Then
-                    Me.Invoke(
-                        Sub()
-                            Try
-                                'Initialize location lists (LVItems, and markers)
-                                _LocationLVItems.Clear()
-                                _LocationsOverlay.Markers.Clear()
+                        'save current state of location overlay then hides it (speeds up populating the markers on the map)
+                        Dim visibility = _LocationsOverlay.IsVisibile
+                        _LocationsOverlay.IsVisibile = False
 
-                                'save current state of location overlay then hides it (speeds up populating the markers on the map)
-                                Dim visibility = _LocationsOverlay.IsVisibile
-                                _LocationsOverlay.IsVisibile = False
+                        'go through the locations list, create LVItems, map markers, and listview items, populate to appropriate places.
+                        For Each l In Locations
+                            'do a postback for to indicate progress
+                            pb.Invoke("Updating locations list (object model)", (_LocationLVItems.Count / Locations.Count))
 
-                                'go through the locations list, create LVItems, map markers, and listview items, populate to appropriate places.
-                                For Each l In Locations
-                                    'do a postback for to indicate progress
-                                    pb.Invoke("Updating locations list (object model)", (_LocationLVItems.Count / Locations.Count))
+                            AddLocation(l)
+                        Next
 
-                                    Dim lv = UpdateLocationLVItem(l)
+                        'restore whatever previous visibility the overlay had
+                        _LocationsOverlay.IsVisibile = visibility
 
-                                    Dim item = New LVItem(Of Location) With {
-                                                        .Item = l,
-                                                        .LVItem = lv,
-                                                        .Marker = If(l.GPS.HasValue, New WindowsForms.Markers.GMarkerGoogle(l.GPS, WindowsForms.Markers.GMarkerGoogleType.red), Nothing)}
+                        RefreshLocations(pb)
+                        UpdateLocationPhotosLists(pb)
 
-                                    item.LVItem.Checked = True
-                                    _LocationLVItems.Add(item)
-                                Next
+                    Catch ex As WaitWindow.DoItCanceledException
+                        'user clicked cancel re-initialize location lists.
+                        LVLocations.Items.Clear()
+                        _LocationLVItems.Clear()
+                        _LocationsOverlay.Markers.Clear()
 
-                                'restore whatever previous visibility the overlay had
-                                _LocationsOverlay.IsVisibile = visibility
+                    End Try
+                End Sub)
+        End If
+    End Sub
 
-                                RefreshLocations(pb)
-                                UpdateLocationPhotosLists()
+    Private Sub AddLocation(Location As Location)
+        Dim lv = UpdateLocationLVItem(Location)
 
-                            Catch ex As WaitWindow.DoItCanceledException
-                                'user clicked cancel re-initialize location lists.
-                                LVLocations.Items.Clear()
-                                _LocationLVItems.Clear()
-                                _LocationsOverlay.Markers.Clear()
+        Dim item = New LVItem(Of Location) With {
+                            .Item = Location,
+                            .LVItem = lv,
+                            .Marker = If(Location.GPS.HasValue, New WindowsForms.Markers.GMarkerGoogle(Location.GPS, WindowsForms.Markers.GMarkerGoogleType.red), Nothing)}
 
-                            End Try
-                        End Sub)
-                End If
-
-            End Sub, Me)
+        item.LVItem.Checked = True
+        _LocationLVItems.Add(item)
     End Sub
 
     Private Sub RefreshLocations(Optional pb As WaitWindow.PostBack = Nothing)
@@ -96,6 +92,18 @@ Partial Class FMain
             Throw
 
         End Try
+    End Sub
+
+    Private Sub TSBImportLocations_Click(sender As Object, e As EventArgs) Handles TSBImportLocations.Click
+        'load loactions from csv
+        Dim Locations As List(Of Location)
+
+        WaitWindow.WaitForIt.DoIt("Importing Locations",
+            Sub(pb)
+                Locations = CSVSerializer.CSVDeserializer(Of Location).Deserialize(Me, False, pb)
+
+                AddLocations(Locations, pb)
+            End Sub, Me)
     End Sub
 
     Private Sub TSBLocationDateFilter_FilterUpdated(sender As Object, e As EventArgs) Handles TSBLocationDateFilter.FilterUpdated
@@ -191,17 +199,26 @@ Partial Class FMain
     End Sub
 
     Private Sub TSBAddLocation_Click(sender As Object, e As EventArgs) Handles TSBAddLocation.Click
-        'Dim a As New FLocationEditor
+        Dim a As New FLocationEditor
 
-        'If a.ShowDialog(Me) = DialogResult.OK Then
-        '    Dim l = a.Value
-
-        '    Dim lv = Me.UpdateLocationLVItem(a.Value)
-        'End If
+        If a.ShowDialog(Me) = DialogResult.OK Then
+            AddLocation(a.Value)
+        End If
     End Sub
 
     Private Sub TSBEditLocation_Click(sender As Object, e As EventArgs) Handles TSBEditLocation.Click
+        Dim SelectedLocation = (From i In _LocationLVItems Where i.LVItem.Selected)
 
+        If SelectedLocation.Count > 0 Then
+            Dim a As New FLocationEditor
+
+            a.Value = SelectedLocation.First.Item
+
+            If a.ShowDialog(Me) = DialogResult.OK Then
+                RefreshLocations()
+                UpdateLocationPhotosLists()
+            End If
+        End If
     End Sub
 
     Private Sub TSBRemoveLocations_Click(sender As Object, e As EventArgs) Handles TSBRemoveLocations.Click
@@ -254,15 +271,17 @@ Partial Class FMain
         Dim lvi = If(lvItem, New ListViewItem)
 
         lvi.SubItems.Clear()
+        lvi.Text = l.LocationName
         lvi.SubItems.AddRange({
-                              l.LocationName,
-                              If(l.Start.HasValue, l.Start, String.Empty),
+                                                            If(l.Start.HasValue, l.Start, String.Empty),
                               If(l.End.HasValue, l.End, String.Empty),
                               l.Address,
                               If(l.Lat.HasValue, l.Lat.Value.ToString("0.000000"), String.Empty),
                               If(l.Long.HasValue, l.Long.Value.ToString("0.000000"), String.Empty),
                               l.ID,
                               l.PhotoCount})
+
+
 
         Return lvi
     End Function

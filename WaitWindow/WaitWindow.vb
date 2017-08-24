@@ -82,8 +82,19 @@ Public NotInheritable Class WaitForIt
                 Task.BeginInvoke(_postback, cb, Nothing)
             End Sub
 
-            f.Text = "Processing: " & Title
-            f.ShowDialog()
+
+            Dim a = Sub()
+                        f.Text = "Processing: " & Title
+
+                        If Not f.Visible Then
+                            f.ShowDialog()
+                        End If
+                    End Sub
+            If f.InvokeRequired Then
+                f.Invoke(a)
+            Else
+                a()
+            End If
         End If
 
     End Sub

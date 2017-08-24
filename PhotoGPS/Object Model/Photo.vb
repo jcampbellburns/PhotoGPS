@@ -11,15 +11,20 @@
         End Set
     End Property
 
-    Shared Function FromFile(File As IO.FileInfo) As Photo
-
+    ''' <summary>
+    ''' Populate instance fields with metadata from a file.
+    ''' </summary>
+    ''' <param name="File">The <see cref="IO.FileInfo"/> from which to populate the <see cref="Photo"/> fields.</param>
+    ''' <returns>On success, returns a reference to this instance. On failure, returns <c>Nothing</c>.</returns>
+    ''' <remarks>This method is called by the static <see cref="photo.FromFile(IO.FileInfo)"/> method when creating a new <see cref="Photo"/> instance. It is also called when renaming or moving the file to update an existing instance.</remarks>
+    Private Function RefreshMetadata(File As IO.FileInfo) As Photo
         Select Case File.Extension.ToUpper
             Case ".JPG", ".JPEG", ".JPE"
                 'pull metadata
                 'instanciate Photo
                 'return it
 
-                Dim res As Photo = Nothing
+                'Dim res As Photo = Nothing
 
                 Try
                     Using reader = New ExifLib.ExifReader(File.FullName)
@@ -39,25 +44,27 @@
 
                         Dim HasTakenDate = reader.GetTagValue(Of Date)(ExifLib.ExifTags.DateTimeDigitized, takenDate)
 
-                        res = New Photo With {
-                            .Filedate = File.LastWriteTime,
-                            .FileSize = File.Length,
-                            .Filename = File.FullName}
+                        With Me
+                            .Filedate = File.LastWriteTime
+                            .FileSize = File.Length
+                            .Filename = File.FullName
 
-                        If HasGPS Then
-                            res.Lat = If(latitudeRef = "N", 1, -1) * (latitudeDMS(0) + (latitudeDMS(1) / 60) + (latitudeDMS(2) / 3600))
-                            res.Long = If(longitudeRef = "E", 1, -1) * (longitudeDMS(0) + (longitudeDMS(1) / 60) + (longitudeDMS(2) / 3600))
-                        End If
+                            If HasGPS Then
+                                .Lat = If(latitudeRef = "N", 1, -1) * (latitudeDMS(0) + (latitudeDMS(1) / 60) + (latitudeDMS(2) / 3600))
+                                .Long = If(longitudeRef = "E", 1, -1) * (longitudeDMS(0) + (longitudeDMS(1) / 60) + (longitudeDMS(2) / 3600))
+                            End If
 
-                        If HasTakenDate Then
-                            res.TakenDate = takenDate
-                        End If
+                            If HasTakenDate Then
+                                .TakenDate = takenDate
+                            End If
+
+                        End With
 
                         If (HasGPS = False) Or (HasTakenDate = False) Then
                             'I want only photos that have gps and a taken date. If either are missing, don't do anything with the image.
                             Return Nothing
                         Else
-                            Return res
+                            Return Me
                         End If
 
                     End Using
@@ -71,7 +78,18 @@
                 '"MOV" and "MP4" are not supported yet. GoPro has not made any information public about how gps data is stored in their files.
                 Return Nothing
         End Select
+    End Function
 
+    ''' <summary>
+    ''' Generate a <see cref="Photo"/> from a photo file.
+    ''' </summary>
+    ''' <param name="File">The <see cref="IO.FileInfo"/> from which to create the <see cref="Photo"/>.</param>
+    ''' <returns>A <see cref="Photo"/> representing the file speciifed by <paramref name="File"/> or <c>Nothing</c> if the file metadate could not be read.</returns>
+    ''' <remarks>This method currently uses the file's extension to differentiate file types. Supported extension are .JPG, .JPEG, and .JPE. While there are plans to include support for other formats, such as MP4, support is only available for JPEG photos at this time.</remarks>
+    Shared Function FromFile(File As IO.FileInfo) As Photo
+        Dim res As New Photo
+
+        Return res.RefreshMetadata(File)
     End Function
 
     <CSVField(CSVFieldName:="Latitude")> Public Lat As Double
@@ -98,31 +116,25 @@
     ''' </summary>
     ''' <remarks>This method renames the file using the format "[Taken Date and Time] GPS=[Lat and Long].[Extension]. If this filename is already in use, _# is appended to the end of the name before the extension, replacing # with the lowest number which is not already in use, starting at 2.</remarks>
     Public Sub RenameFile()
-        Dim folder = New IO.FileInfo(Me.Filename).DirectoryName
-        Dim nf As String = Me.Filename
+        Dim a As New IO.FileInfo(Filename)
+        Dim folder = a.DirectoryName
+        Dim ext = a.Extension
 
-        Dim i = 1I
-        Dim exists = True 'ensure at least one filename is generated
+        Filename = a.MoveTo(String.Format("{0}\{1} GPS={2}, {3}{4}", folder, Me.TakenDate.ToString("yyyy-MM-dd HH.mm.ss"), Me.Lat.ToString("0.000000"), Me.Long.ToString("0.000000"), ext), False)
 
-        While exists = True
+        IO.File.SetCreationTime(Filename, TakenDate)
+        IO.File.SetLastWriteTime(Filename, TakenDate)
 
-            Dim dup As String = If(i = 1, "", "_" & i)
+        Me.RefreshMetadata(a)
+    End Sub
 
-            nf = String.Format("{0}\{1} GPS={2}, {3}{4}{5}", folder, Me.TakenDate.ToString("yyyy-MM-dd HH.mm.ss"), Me.Lat.ToString("0.000000"), Me.Long.ToString("0.000000"), dup, New IO.FileInfo(Me.Filename).Extension)
+    Public Sub MoveToFolder(Folder As String)
+        Dim a As New IO.FileInfo(Filename)
+        Dim fn = a.Name
 
-            exists = (IO.File.Exists(nf) And (nf <> Me.Filename))
-            i += 1
-        End While
+        a.MoveTo(IO.Path.Combine(Folder, fn), True)
 
-        If nf <> Me.Filename Then
-            Dim file = New IO.FileInfo(Me.Filename)
-            file.MoveTo(nf)
-
-            Me.Filename = nf
-        End If
-
-        IO.File.SetCreationTime(nf, TakenDate)
-        IO.File.SetLastWriteTime(nf, TakenDate)
+        Me.RefreshMetadata(a)
     End Sub
 
 End Class

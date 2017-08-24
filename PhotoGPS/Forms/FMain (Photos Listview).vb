@@ -9,46 +9,7 @@ Partial Class FMain
     Private _PhotoLVItems As New List(Of LVItem(Of Photo))
     Private _PhotosOverlay As New WindowsForms.GMapOverlay("Photos")
 
-    Private Sub TSBAddPhotosFolder_Click(sender As Object, e As EventArgs) Handles TSBAddPhotosFolder.Click
 
-        Dim fb As New Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog
-
-        fb.IsFolderPicker = True
-
-        If fb.ShowDialog() = DialogResult.OK Then
-            Dim MsgBoxRecursiveResponse = MsgBox("Load all photos from subfolders recursively as well?", MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Question Or MsgBoxStyle.DefaultButton2)
-
-            If MsgBoxRecursiveResponse <> MsgBoxResult.Cancel Then
-                Dim AllFiles = IO.Directory.EnumerateFiles(fb.FileName, "*", If(MsgBoxRecursiveResponse = MsgBoxResult.Yes, IO.SearchOption.AllDirectories, IO.SearchOption.TopDirectoryOnly))
-
-                Dim FilteredFiles As New List(Of String)
-
-                For Each ext In Photo.SupportedExtensions
-                    FilteredFiles.AddRange(From i In AllFiles Where i Like ext)
-                Next
-
-                AddPhotoFiles(FilteredFiles.Distinct)
-
-            End If
-        End If
-
-    End Sub
-
-    Private Sub TSBAddPhotosFile_Click(sender As Object, e As EventArgs) Handles TSBAddPhotosFile.Click
-        Dim fb As New Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog
-
-        fb.AllowNonFileSystemItems = False
-        fb.Filters.Add(New Microsoft.WindowsAPICodePack.Dialogs.CommonFileDialogFilter("Supported Photo Types", String.Join(";", Photo.SupportedExtensions)))
-        fb.Filters.Add(New Microsoft.WindowsAPICodePack.Dialogs.CommonFileDialogFilter("All Files", "*"))
-
-        fb.Multiselect = True
-        fb.EnsureFileExists = True
-        fb.EnsurePathExists = True
-
-        If fb.ShowDialog() = DialogResult.OK Then
-            AddPhotoFiles(fb.FileNames)
-        End If
-    End Sub
 
     Private Sub AddPhotoFiles(files As IEnumerable(Of String))
 
@@ -76,8 +37,10 @@ Partial Class FMain
                     End If
                 Next
 
-                UpdateLocationPhotosLists(pb)
+
                 RefreshPhotos()
+                UpdateLocationPhotosLists(pb)
+
 
 
             Catch ex As WaitWindow.DoItCanceledException
@@ -125,6 +88,51 @@ Partial Class FMain
 
     End Sub
 
+    Private Sub TBSAddPhotos_ButtonClick(sender As Object, e As EventArgs) Handles TBSAddPhotos.ButtonClick
+        TSBAddPhotosFolder_Click(sender, e)
+    End Sub
+
+    Private Sub TSBAddPhotosFolder_Click(sender As Object, e As EventArgs) Handles TSBAddPhotosFolder.Click
+
+        Dim fb As New Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog
+
+        fb.IsFolderPicker = True
+
+        If fb.ShowDialog() = DialogResult.OK Then
+            Dim MsgBoxRecursiveResponse = MsgBox("Load all photos from subfolders recursively as well?", MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Question Or MsgBoxStyle.DefaultButton2)
+
+            If MsgBoxRecursiveResponse <> MsgBoxResult.Cancel Then
+                Dim AllFiles = IO.Directory.EnumerateFiles(fb.FileName, "*", If(MsgBoxRecursiveResponse = MsgBoxResult.Yes, IO.SearchOption.AllDirectories, IO.SearchOption.TopDirectoryOnly))
+
+                Dim FilteredFiles As New List(Of String)
+
+                For Each ext In Photo.SupportedExtensions
+                    FilteredFiles.AddRange(From i In AllFiles Where i.ToUpper Like ext.ToUpper)
+                Next
+
+                AddPhotoFiles(FilteredFiles.Distinct)
+
+            End If
+        End If
+
+    End Sub
+
+    Private Sub TSBAddPhotosFile_Click(sender As Object, e As EventArgs) Handles TSBAddPhotosFile.Click
+        Dim fb As New Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog
+
+        fb.AllowNonFileSystemItems = False
+        fb.Filters.Add(New Microsoft.WindowsAPICodePack.Dialogs.CommonFileDialogFilter("Supported Photo Types", String.Join(";", Photo.SupportedExtensions)))
+        fb.Filters.Add(New Microsoft.WindowsAPICodePack.Dialogs.CommonFileDialogFilter("All Files", "*"))
+
+        fb.Multiselect = True
+        fb.EnsureFileExists = True
+        fb.EnsurePathExists = True
+
+        If fb.ShowDialog() = DialogResult.OK Then
+            AddPhotoFiles(fb.FileNames)
+        End If
+    End Sub
+
     Private Sub TSBRenamePhotoFiles_Click(sender As Object, e As EventArgs) Handles TSBRenamePhotoFiles.Click
         Dim s = (From i In _PhotoLVItems Where i.LVItem.Selected Select i.Item).ToList
 
@@ -165,6 +173,12 @@ Partial Class FMain
         _PhotoLVItems.RemoveAll(Function(i) (IO.File.Exists(i.Item.Filename) = False))
         UpdateLocationPhotosLists()
         RefreshPhotos()
+    End Sub
+
+
+
+    Private Sub TSBRemovePhotos_Click(sender As Object, e As EventArgs) Handles TSBRemovePhotos.Click
+        TSBRemoveSelectedPhotos_Click(sender, e)
     End Sub
 
     ''' <summary>

@@ -56,8 +56,6 @@ Partial Class FMain
         Dim ColumnHeader9 As System.Windows.Forms.ColumnHeader
         Dim ColumnHeader10 As System.Windows.Forms.ColumnHeader
         Dim ToolStrip6 As System.Windows.Forms.ToolStrip
-        Dim ToolStripButton5 As System.Windows.Forms.ToolStripSplitButton
-        Dim ToolStripButton3 As System.Windows.Forms.ToolStripSplitButton
         Dim CaptionBarControl2 As PhotoGPS.CaptionBarControl
         Dim ToolStrip1 As System.Windows.Forms.ToolStrip
         Dim CAPTIONgps As PhotoGPS.CaptionBarControl
@@ -83,13 +81,20 @@ Partial Class FMain
         Me.TSBLocationDateFilter = New PhotoGPS.ToolStripCalendarDropdown()
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.LVPhotos = New System.Windows.Forms.ListView()
+        Me.TSBRemovePhotos = New System.Windows.Forms.ToolStripSplitButton()
         Me.TSBRemoveSelectedPhotos = New System.Windows.Forms.ToolStripMenuItem()
         Me.TSBRemovePhotosNoLongerAvailable = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
         Me.TSBRemoveAllPhotos = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TBSAddPhotos = New System.Windows.Forms.ToolStripSplitButton()
         Me.TSBAddPhotosFolder = New System.Windows.Forms.ToolStripMenuItem()
         Me.TSBAddPhotosFile = New System.Windows.Forms.ToolStripMenuItem()
         Me.TSBRenamePhotoFiles = New System.Windows.Forms.ToolStripButton()
+        Me.TSBSortPhotos = New System.Windows.Forms.ToolStripDropDownButton()
+        Me.TSBSortPhotosByLocationName = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TSBSortPhotosByTakenDate = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TSBSortPhotosSameFolder = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripButton11 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton14 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
@@ -128,8 +133,6 @@ Partial Class FMain
         ColumnHeader9 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ColumnHeader10 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ToolStrip6 = New System.Windows.Forms.ToolStrip()
-        ToolStripButton5 = New System.Windows.Forms.ToolStripSplitButton()
-        ToolStripButton3 = New System.Windows.Forms.ToolStripSplitButton()
         CaptionBarControl2 = New PhotoGPS.CaptionBarControl()
         ToolStrip1 = New System.Windows.Forms.ToolStrip()
         CAPTIONgps = New PhotoGPS.CaptionBarControl()
@@ -362,7 +365,7 @@ Partial Class FMain
         'Splitter1
         '
         Me.Splitter1.Dock = System.Windows.Forms.DockStyle.Right
-        Me.Splitter1.Location = New System.Drawing.Point(505, 38)
+        Me.Splitter1.Location = New System.Drawing.Point(421, 38)
         Me.Splitter1.Name = "Splitter1"
         Me.Splitter1.Size = New System.Drawing.Size(3, 478)
         Me.Splitter1.TabIndex = 5
@@ -376,7 +379,7 @@ Partial Class FMain
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Panel1.Location = New System.Drawing.Point(0, 38)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(508, 478)
+        Me.Panel1.Size = New System.Drawing.Size(424, 478)
         Me.Panel1.TabIndex = 4
         '
         'LVLocations
@@ -390,7 +393,7 @@ Partial Class FMain
         Me.LVLocations.MultiSelect = False
         Me.LVLocations.Name = "LVLocations"
         Me.LVLocations.ShowGroups = False
-        Me.LVLocations.Size = New System.Drawing.Size(508, 440)
+        Me.LVLocations.Size = New System.Drawing.Size(424, 440)
         Me.LVLocations.TabIndex = 4
         Me.LVLocations.UseCompatibleStateImageBehavior = False
         Me.LVLocations.View = System.Windows.Forms.View.Details
@@ -433,7 +436,7 @@ Partial Class FMain
         ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBImportLocations, Me.TSBExportLocations, Me.ToolStripSeparator1, Me.TSBLocationsVisible, Me.TSBGetLocationCoords, Me.TSBEditLocation, Me.TSBRemoveLocations, Me.TSBAddLocation, Me.ToolStripSeparator2, Me.TSBLocationDateFilter})
         ToolStrip2.Location = New System.Drawing.Point(0, 13)
         ToolStrip2.Name = "ToolStrip2"
-        ToolStrip2.Size = New System.Drawing.Size(508, 25)
+        ToolStrip2.Size = New System.Drawing.Size(424, 25)
         ToolStrip2.TabIndex = 1
         ToolStrip2.Text = "ToolStrip2"
         '
@@ -496,13 +499,13 @@ Partial Class FMain
         Me.TSBEditLocation.Size = New System.Drawing.Size(23, 22)
         Me.TSBEditLocation.Text = "ToolStripButton4"
         '
-        'TSBRemoveLocation
+        'TSBRemoveLocations
         '
         Me.TSBRemoveLocations.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
         Me.TSBRemoveLocations.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.TSBRemoveLocations.Image = CType(resources.GetObject("TSBRemoveLocation.Image"), System.Drawing.Image)
+        Me.TSBRemoveLocations.Image = CType(resources.GetObject("TSBRemoveLocations.Image"), System.Drawing.Image)
         Me.TSBRemoveLocations.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.TSBRemoveLocations.Name = "TSBRemoveLocation"
+        Me.TSBRemoveLocations.Name = "TSBRemoveLocations"
         Me.TSBRemoveLocations.Size = New System.Drawing.Size(23, 22)
         Me.TSBRemoveLocations.Text = "ToolStripButton5"
         '
@@ -539,7 +542,7 @@ Partial Class FMain
         CaptionBarControl1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText
         CaptionBarControl1.Location = New System.Drawing.Point(0, 0)
         CaptionBarControl1.Name = "CaptionBarControl1"
-        CaptionBarControl1.Size = New System.Drawing.Size(508, 13)
+        CaptionBarControl1.Size = New System.Drawing.Size(424, 13)
         CaptionBarControl1.TabIndex = 5
         CaptionBarControl1.Text = "Locations"
         CaptionBarControl1.TextAlign = System.Drawing.ContentAlignment.TopCenter
@@ -551,9 +554,9 @@ Partial Class FMain
         Me.Panel2.Controls.Add(ToolStrip6)
         Me.Panel2.Controls.Add(CaptionBarControl2)
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Right
-        Me.Panel2.Location = New System.Drawing.Point(508, 38)
+        Me.Panel2.Location = New System.Drawing.Point(424, 38)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(231, 478)
+        Me.Panel2.Size = New System.Drawing.Size(315, 478)
         Me.Panel2.TabIndex = 6
         '
         'LVPhotos
@@ -563,7 +566,7 @@ Partial Class FMain
         Me.LVPhotos.FullRowSelect = True
         Me.LVPhotos.Location = New System.Drawing.Point(0, 38)
         Me.LVPhotos.Name = "LVPhotos"
-        Me.LVPhotos.Size = New System.Drawing.Size(231, 440)
+        Me.LVPhotos.Size = New System.Drawing.Size(315, 440)
         Me.LVPhotos.TabIndex = 4
         Me.LVPhotos.UseCompatibleStateImageBehavior = False
         Me.LVPhotos.View = System.Windows.Forms.View.Details
@@ -583,25 +586,26 @@ Partial Class FMain
         'ToolStrip6
         '
         ToolStrip6.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        ToolStrip6.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripButton5, ToolStripButton3, Me.TSBRenamePhotoFiles})
+        ToolStrip6.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBRemovePhotos, Me.TBSAddPhotos, Me.TSBRenamePhotoFiles, Me.TSBSortPhotos})
         ToolStrip6.Location = New System.Drawing.Point(0, 13)
         ToolStrip6.Name = "ToolStrip6"
-        ToolStrip6.Size = New System.Drawing.Size(231, 25)
+        ToolStrip6.Size = New System.Drawing.Size(315, 25)
         ToolStrip6.TabIndex = 3
         '
-        'ToolStripButton5
+        'TSBRemovePhotos
         '
-        ToolStripButton5.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-        ToolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        ToolStripButton5.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBRemoveSelectedPhotos, Me.TSBRemovePhotosNoLongerAvailable, Me.ToolStripSeparator3, Me.TSBRemoveAllPhotos})
-        ToolStripButton5.Image = CType(resources.GetObject("ToolStripButton5.Image"), System.Drawing.Image)
-        ToolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta
-        ToolStripButton5.Name = "ToolStripButton5"
-        ToolStripButton5.Size = New System.Drawing.Size(32, 22)
-        ToolStripButton5.Text = "ToolStripButton5"
+        Me.TSBRemovePhotos.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.TSBRemovePhotos.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TSBRemovePhotos.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBRemoveSelectedPhotos, Me.TSBRemovePhotosNoLongerAvailable, Me.ToolStripSeparator3, Me.TSBRemoveAllPhotos})
+        Me.TSBRemovePhotos.Image = CType(resources.GetObject("TSBRemovePhotos.Image"), System.Drawing.Image)
+        Me.TSBRemovePhotos.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TSBRemovePhotos.Name = "TSBRemovePhotos"
+        Me.TSBRemovePhotos.Size = New System.Drawing.Size(32, 22)
+        Me.TSBRemovePhotos.Text = "ToolStripButton5"
         '
         'TSBRemoveSelectedPhotos
         '
+        Me.TSBRemoveSelectedPhotos.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.TSBRemoveSelectedPhotos.Name = "TSBRemoveSelectedPhotos"
         Me.TSBRemoveSelectedPhotos.Size = New System.Drawing.Size(260, 22)
         Me.TSBRemoveSelectedPhotos.Text = "Remove selected photos"
@@ -623,27 +627,27 @@ Partial Class FMain
         Me.TSBRemoveAllPhotos.Size = New System.Drawing.Size(260, 22)
         Me.TSBRemoveAllPhotos.Text = "Remove all photos..."
         '
-        'ToolStripButton3
+        'TBSAddPhotos
         '
-        ToolStripButton3.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-        ToolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        ToolStripButton3.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBAddPhotosFolder, Me.TSBAddPhotosFile})
-        ToolStripButton3.Image = CType(resources.GetObject("ToolStripButton3.Image"), System.Drawing.Image)
-        ToolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta
-        ToolStripButton3.Name = "ToolStripButton3"
-        ToolStripButton3.Size = New System.Drawing.Size(32, 22)
-        ToolStripButton3.Text = "ToolStripButton11"
+        Me.TBSAddPhotos.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.TBSAddPhotos.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TBSAddPhotos.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBAddPhotosFolder, Me.TSBAddPhotosFile})
+        Me.TBSAddPhotos.Image = CType(resources.GetObject("TBSAddPhotos.Image"), System.Drawing.Image)
+        Me.TBSAddPhotos.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TBSAddPhotos.Name = "TBSAddPhotos"
+        Me.TBSAddPhotos.Size = New System.Drawing.Size(32, 22)
         '
         'TSBAddPhotosFolder
         '
+        Me.TSBAddPhotosFolder.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TSBAddPhotosFolder.Name = "TSBAddPhotosFolder"
-        Me.TSBAddPhotosFolder.Size = New System.Drawing.Size(209, 22)
+        Me.TSBAddPhotosFolder.Size = New System.Drawing.Size(213, 22)
         Me.TSBAddPhotosFolder.Text = "Add photos from folder..."
         '
         'TSBAddPhotosFile
         '
         Me.TSBAddPhotosFile.Name = "TSBAddPhotosFile"
-        Me.TSBAddPhotosFile.Size = New System.Drawing.Size(209, 22)
+        Me.TSBAddPhotosFile.Size = New System.Drawing.Size(213, 22)
         Me.TSBAddPhotosFile.Text = "Add photos individually..."
         '
         'TSBRenamePhotoFiles
@@ -654,6 +658,39 @@ Partial Class FMain
         Me.TSBRenamePhotoFiles.Size = New System.Drawing.Size(70, 22)
         Me.TSBRenamePhotoFiles.Text = "Rename"
         '
+        'TSBSortPhotos
+        '
+        Me.TSBSortPhotos.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBSortPhotosByLocationName, Me.TSBSortPhotosByTakenDate, Me.TSBSortPhotosSameFolder, Me.ToolStripMenuItem1})
+        Me.TSBSortPhotos.Image = CType(resources.GetObject("TSBSortPhotos.Image"), System.Drawing.Image)
+        Me.TSBSortPhotos.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TSBSortPhotos.Name = "TSBSortPhotos"
+        Me.TSBSortPhotos.Size = New System.Drawing.Size(107, 22)
+        Me.TSBSortPhotos.Text = "Sort to Folder"
+        '
+        'TSBSortPhotosByLocationName
+        '
+        Me.TSBSortPhotosByLocationName.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.TSBSortPhotosByLocationName.Name = "TSBSortPhotosByLocationName"
+        Me.TSBSortPhotosByLocationName.Size = New System.Drawing.Size(200, 22)
+        Me.TSBSortPhotosByLocationName.Text = "Sort by Location Name"
+        '
+        'TSBSortPhotosByTakenDate
+        '
+        Me.TSBSortPhotosByTakenDate.Name = "TSBSortPhotosByTakenDate"
+        Me.TSBSortPhotosByTakenDate.Size = New System.Drawing.Size(200, 22)
+        Me.TSBSortPhotosByTakenDate.Text = "Sort by Taken Date"
+        '
+        'TSBSortPhotosSameFolder
+        '
+        Me.TSBSortPhotosSameFolder.Name = "TSBSortPhotosSameFolder"
+        Me.TSBSortPhotosSameFolder.Size = New System.Drawing.Size(200, 22)
+        Me.TSBSortPhotosSameFolder.Text = "All same folder"
+        '
+        'ToolStripMenuItem1
+        '
+        Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(197, 6)
+        '
         'CaptionBarControl2
         '
         CaptionBarControl2.AutoEllipsis = True
@@ -663,7 +700,7 @@ Partial Class FMain
         CaptionBarControl2.ForeColor = System.Drawing.SystemColors.ActiveCaptionText
         CaptionBarControl2.Location = New System.Drawing.Point(0, 0)
         CaptionBarControl2.Name = "CaptionBarControl2"
-        CaptionBarControl2.Size = New System.Drawing.Size(231, 13)
+        CaptionBarControl2.Size = New System.Drawing.Size(315, 13)
         CaptionBarControl2.TabIndex = 6
         CaptionBarControl2.Text = "Photos"
         CaptionBarControl2.TextAlign = System.Drawing.ContentAlignment.TopCenter
@@ -862,4 +899,11 @@ Partial Class FMain
     Friend WithEvents TSBEditLocation As ToolStripButton
     Friend WithEvents TSBRemoveLocations As ToolStripButton
     Friend WithEvents TSBAddLocation As ToolStripButton
+    Friend WithEvents TBSAddPhotos As ToolStripSplitButton
+    Friend WithEvents TSBRemovePhotos As ToolStripSplitButton
+    Friend WithEvents TSBSortPhotos As ToolStripDropDownButton
+    Friend WithEvents TSBSortPhotosSameFolder As ToolStripMenuItem
+    Friend WithEvents TSBSortPhotosByLocationName As ToolStripMenuItem
+    Friend WithEvents TSBSortPhotosByTakenDate As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem1 As ToolStripSeparator
 End Class

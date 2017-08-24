@@ -1,5 +1,47 @@
 ﻿Imports System.Runtime.CompilerServices
 
+Module IOFileinfoExtensions
+
+    ''' <summary>
+    ''' Safely rename or move a file.
+    ''' </summary>
+    ''' <param name="file">The file to be renamed or moved.</param>
+    ''' <param name="destFileName">The proposed file name to which <paramref name="file"/> is to be renamed or moved.</param>
+    ''' <param name="Overwrite">If <c>True</c>, <paramref name="destFileName"/> will be overwritten if it exists. If <c>False</c>, the file will be renamed to include a number. This parameter is not used if <paramref name="destFileName"/> references a file which does not exist yet.</param>
+    ''' <returns>The filename and path <paramref name="file"/> has after this method returns. If <paramref name="destFileName"/> existed prior to <paramref name="file"/> being renamed or moved and <paramref name="Overwrite"/> was set to <c>False</c>, this value will differ from <paramref name="destFileName"/>.</returns>
+    <Extension> Public Function MoveTo(file As IO.FileInfo, destFileName As String, Overwrite As Boolean) As String
+        Dim proposedFileName = destFileName
+
+
+        If (proposedFileName <> file.FullName) Then
+            If IO.File.Exists(proposedFileName) Then
+                If Overwrite Then
+                    'overwrite
+                    IO.File.Delete(proposedFileName)
+                Else
+                    'safely rename
+                    Dim folder = IO.Path.GetDirectoryName(proposedFileName)
+                    Dim filename = IO.Path.GetFileNameWithoutExtension(proposedFileName)
+                    Dim ext = IO.Path.GetExtension(proposedFileName)
+
+                    Dim i As UInteger = 2
+                    While IO.File.Exists(proposedFileName)
+                        proposedFileName = folder & IO.Path.DirectorySeparatorChar & filename & " (" & i.ToString & ")" & ext
+                        i += 1
+                    End While
+
+                End If
+            End If
+
+            file.MoveTo(proposedFileName)
+
+        End If
+
+        Return proposedFileName
+    End Function
+End Module
+
+
 Module PointLatLngExtensions
     <Extension()>
     Public Function DistanceTo(Start As PointLatLng, Destination As PointLatLng, Optional Units As DistanceToUnits = DistanceToUnits.Meters) As Double
@@ -25,7 +67,6 @@ Module PointLatLngExtensions
                 Throw New NotImplementedException()
         End Select
     End Function
-
     Public Enum DistanceToUnits
         Meters = 0
         Kilometers = 1 '0.001
@@ -33,12 +74,6 @@ Module PointLatLngExtensions
         Yards = 3
         Miles = 4
     End Enum
-
-
-    '*************************************************************
-    'Private Const PI = 3.14159265358979
-    'Private Const EPSILON As Double = 0.000000000001
-
 
     Private Function distVincenty(ByVal lat1 As Double, ByVal lon1 As Double, ByVal lat2 As Double, ByVal lon2 As Double) As Double
         'INPUTS: Latitude and Longitude of initial and 
@@ -323,6 +358,5 @@ Module PointLatLngExtensions
             End If
         End If
     End Function
-    '======================================
 End Module
 

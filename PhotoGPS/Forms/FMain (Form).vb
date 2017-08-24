@@ -202,4 +202,104 @@
         Public LVItem As ListViewItem
         Public Marker As WindowsForms.GMapMarker
     End Structure
+
+    Private Sub TSBSortPhotosSameFolder_Click(sender As Object, e As EventArgs) Handles TSBSortPhotosSameFolder.Click
+        Dim photos = (From i In _PhotoLVItems Where i.LVItem.Selected).ToArray
+        If photos.Count = 0 Then photos = (From i In _PhotoLVItems Where i.LVItem.ListView Is LVPhotos).ToArray
+
+        Dim fb As New Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog
+
+        fb.IsFolderPicker = True
+
+        If fb.ShowDialog() = DialogResult.OK Then
+
+            WaitWindow.WaitForIt.DoIt("Organizing Photos",
+                Sub(pb)
+                    Try
+                        For i = 0 To photos.Count - 1
+                            pb.Invoke(String.Format("Moving photos. {0} remaining", photos.Count - i), i / photos.Count)
+
+                            Dim p = photos(i)
+
+                            p.Item.MoveToFolder(fb.FileName)
+
+                        Next i
+                    Catch ex As WaitWindow.DoItCanceledException
+
+                    End Try
+                End Sub, Me)
+        End If
+    End Sub
+
+    Private Sub TSBSortPhotosByTakenDate_Click(sender As Object, e As EventArgs) Handles TSBSortPhotosByTakenDate.Click
+        Dim photos = (From i In _PhotoLVItems Where i.LVItem.Selected).ToArray
+        If photos.Count = 0 Then photos = (From i In _PhotoLVItems Where i.LVItem.ListView Is LVPhotos).ToArray
+
+        Dim fb As New Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog
+
+        fb.IsFolderPicker = True
+
+        If fb.ShowDialog() = DialogResult.OK Then
+
+
+            WaitWindow.WaitForIt.DoIt("Organizing Photos",
+            Sub(pb)
+                Try
+                    For i = 0 To photos.Count - 1
+                        pb.Invoke(String.Format("Moving photos. {0} remaining", photos.Count - i), i / photos.Count)
+
+                        Dim p = photos(i)
+
+                        Dim subfolder = IO.Path.Combine(fb.FileName, p.Item.TakenDate.ToString("yyyy-MM-dd"))
+
+                        If Not IO.Directory.Exists(subfolder) Then
+                            IO.Directory.CreateDirectory(subfolder)
+                        End If
+
+                        p.Item.MoveToFolder(subfolder)
+
+                    Next i
+                Catch ex As WaitWindow.DoItCanceledException
+
+                End Try
+            End Sub, Me)
+        End If
+    End Sub
+
+    Private Sub TSBSortPhotosByLocationName_Click(sender As Object, e As EventArgs) Handles TSBSortPhotosByLocationName.Click
+        Dim photos = (From i In _PhotoLVItems Where i.LVItem.Selected And i.Item.LocationCount > 0).ToArray
+        If photos.Count = 0 Then photos = (From i In _PhotoLVItems Where i.LVItem.ListView Is LVPhotos And i.Item.LocationCount > 0).ToArray
+
+        Dim fb As New Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog
+
+        fb.IsFolderPicker = True
+
+        If fb.ShowDialog() = DialogResult.OK Then
+
+
+            WaitWindow.WaitForIt.DoIt("Organizing Photos",
+            Sub(pb)
+                Try
+                    For i = 0 To photos.Count - 1
+                        pb.Invoke(String.Format("Moving photos. {0} remaining", photos.Count - i), i / photos.Count)
+
+                        Dim p = photos(i)
+
+                        Dim subfolder = IO.Path.Combine(fb.FileName, String.Join(", ", From l In p.Item.Locations Select l.LocationName Order By LocationName Ascending Distinct))
+
+                        If Not IO.Directory.Exists(subfolder) Then
+                            IO.Directory.CreateDirectory(subfolder)
+                        End If
+
+                        p.Item.MoveToFolder(subfolder)
+
+                    Next i
+                Catch ex As WaitWindow.DoItCanceledException
+
+                End Try
+            End Sub, Me)
+        End If
+    End Sub
+
+
 End Class

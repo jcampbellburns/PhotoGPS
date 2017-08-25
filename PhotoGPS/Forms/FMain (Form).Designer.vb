@@ -77,8 +77,6 @@ Partial Class FMain
         Me.TSBEditLocation = New System.Windows.Forms.ToolStripButton()
         Me.TSBRemoveLocations = New System.Windows.Forms.ToolStripButton()
         Me.TSBAddLocation = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
-        Me.TSBLocationDateFilter = New PhotoGPS.ToolStripCalendarDropdown()
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.LVPhotos = New System.Windows.Forms.ListView()
         Me.TSBRemovePhotos = New System.Windows.Forms.ToolStripSplitButton()
@@ -397,6 +395,7 @@ Partial Class FMain
         Me.LVLocations.TabIndex = 4
         Me.LVLocations.UseCompatibleStateImageBehavior = False
         Me.LVLocations.View = System.Windows.Forms.View.Details
+        Me.LVLocations.VirtualMode = True
         '
         'ColumnHeader1
         '
@@ -433,7 +432,7 @@ Partial Class FMain
         'ToolStrip2
         '
         ToolStrip2.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBImportLocations, Me.TSBExportLocations, Me.ToolStripSeparator1, Me.TSBLocationsVisible, Me.TSBGetLocationCoords, Me.TSBEditLocation, Me.TSBRemoveLocations, Me.TSBAddLocation, Me.ToolStripSeparator2, Me.TSBLocationDateFilter})
+        ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBImportLocations, Me.TSBExportLocations, Me.ToolStripSeparator1, Me.TSBLocationsVisible, Me.TSBGetLocationCoords, Me.TSBEditLocation, Me.TSBRemoveLocations, Me.TSBAddLocation})
         ToolStrip2.Location = New System.Drawing.Point(0, 13)
         ToolStrip2.Name = "ToolStrip2"
         ToolStrip2.Size = New System.Drawing.Size(424, 25)
@@ -519,20 +518,6 @@ Partial Class FMain
         Me.TSBAddLocation.Size = New System.Drawing.Size(23, 22)
         Me.TSBAddLocation.Text = "ToolStripButton11"
         '
-        'ToolStripSeparator2
-        '
-        Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(6, 25)
-        '
-        'TSBLocationDateFilter
-        '
-        Me.TSBLocationDateFilter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.TSBLocationDateFilter.FilterEnabled = False
-        Me.TSBLocationDateFilter.Image = CType(resources.GetObject("TSBLocationDateFilter.Image"), System.Drawing.Image)
-        Me.TSBLocationDateFilter.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.TSBLocationDateFilter.Name = "TSBLocationDateFilter"
-        Me.TSBLocationDateFilter.Size = New System.Drawing.Size(29, 22)
-        '
         'CaptionBarControl1
         '
         CaptionBarControl1.AutoEllipsis = True
@@ -570,6 +555,7 @@ Partial Class FMain
         Me.LVPhotos.TabIndex = 4
         Me.LVPhotos.UseCompatibleStateImageBehavior = False
         Me.LVPhotos.View = System.Windows.Forms.View.Details
+        Me.LVPhotos.VirtualMode = True
         '
         'ColumnHeader8
         '
@@ -879,8 +865,6 @@ Partial Class FMain
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents TSBLocationsVisible As ToolStripButton
     Friend WithEvents TSBGetLocationCoords As ToolStripButton
-    Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
-    Friend WithEvents TSBLocationDateFilter As ToolStripCalendarDropdown
     Friend WithEvents LVLocations As ListView
     Friend WithEvents LVPhotos As ListView
     Friend WithEvents ToolStripProgressBar1 As ToolStripProgressBar

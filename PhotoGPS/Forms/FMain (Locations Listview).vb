@@ -6,7 +6,6 @@ End Class
 
 'Locations listview methods
 Partial Class FMain
-    Private _LocationLVItems As New List(Of LVItem(Of Location))
     Private _LocationsOverlay As New WindowsForms.GMapOverlay("Locations")
 
     Private _AllFilesItem As New ListViewItem({"(All Files)", "", "", "", "", "", "", "Undefined"})
@@ -15,6 +14,8 @@ Partial Class FMain
 
     Private _SpecialLocationItems As List(Of ListViewItem) = {_AllFilesItem, _PhotosWithMultipleLocations, _UnassociatedFilesItem}.ToList
 
+    Private _Locations As IEnumerable(Of Location)
+    Private _LocationLVItems As ListViewItem()
 
     Private Sub AddLocations(Locations As List(Of Location), pb As WaitWindow.PostBack)
         If Locations IsNot Nothing Then
@@ -52,18 +53,6 @@ Partial Class FMain
                     End Try
                 End Sub)
         End If
-    End Sub
-
-    Private Sub AddLocation(Location As Location)
-        Dim lv = UpdateLocationLVItem(Location)
-
-        Dim item = New LVItem(Of Location) With {
-                            .Item = Location,
-                            .LVItem = lv,
-                            .Marker = If(Location.GPS.HasValue, New WindowsForms.Markers.GMarkerGoogle(Location.GPS, WindowsForms.Markers.GMarkerGoogleType.red), Nothing)}
-
-        item.LVItem.Checked = True
-        _LocationLVItems.Add(item)
     End Sub
 
     Private Sub RefreshLocations(Optional pb As WaitWindow.PostBack = Nothing)
@@ -248,42 +237,5 @@ Partial Class FMain
         End If
 
     End Sub
-
-    ''' <summary>
-    ''' Creates or updates a <see cref="ListViewItem"/> from a <see cref="Location"/>.
-    ''' </summary>
-    ''' <param name="l">The <see cref="Location"/> from which to create the <see cref="ListViewItem"/>.</param>
-    ''' <param name="lvItem">Optional. The <see cref="ListViewItem"/> to update. If not specified, a new <see cref="ListViewItem"/> is created.</param>
-    ''' <returns>Returns the <see cref="ListViewItem"/> that was updated or created.</returns>
-    ''' <remarks>The listview is created with four subitems:
-    ''' <list type="bullet">
-    ''' <item><description><see cref="Location.LocationName"/></description></item>
-    ''' <item><description><see cref="Location.Start"/> or <see cref="System.String.Empty"/> if <see cref="Location.Start"/> is null</description></item>
-    ''' <item><description><see cref="Location.End"/> or <see cref="System.String.Empty"/> if <see cref="Location.End"/> is null</description></item>
-    ''' <item><description><see cref="Location.Address"/></description></item>
-    ''' <item><description><see cref="Location.Lat"/> formatted to 6 digits of precision or <see cref="System.String.Empty"/> if <see cref="Location.Lat"/> is null</description></item>
-    ''' <item><description><see cref="Location.Long"/> formatted to 6 digits of precision or <see cref="System.String.Empty"/> if <see cref="Location.Long"/> is null</description></item>
-    ''' <item><description><see cref="Location.ID"/></description></item>
-    ''' <item><description><see cref="Location.PhotoCount"/></description></item>
-    ''' </list>
-    ''' </remarks>
-    Private Function UpdateLocationLVItem(l As Location, Optional lvItem As ListViewItem = Nothing) As ListViewItem
-        Dim lvi = If(lvItem, New ListViewItem)
-
-        lvi.SubItems.Clear()
-        lvi.Text = l.LocationName
-        lvi.SubItems.AddRange({
-                                                            If(l.Start.HasValue, l.Start, String.Empty),
-                              If(l.End.HasValue, l.End, String.Empty),
-                              l.Address,
-                              If(l.Lat.HasValue, l.Lat.Value.ToString("0.000000"), String.Empty),
-                              If(l.Long.HasValue, l.Long.Value.ToString("0.000000"), String.Empty),
-                              l.ID,
-                              l.PhotoCount})
-
-
-
-        Return lvi
-    End Function
 
 End Class

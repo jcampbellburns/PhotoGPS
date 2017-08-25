@@ -137,4 +137,20 @@
         Me.RefreshMetadata(a)
     End Sub
 
+    Public ReadOnly Property ListviewItem As ListViewItem
+        Get
+            Static lvi = New ListViewItem
+
+            lvi.SubItems.Clear()
+
+            lvi.Text = Me.TakenDate
+            lvi.SubItems.AddRange({
+                                  Me.Lat.ToString("0.000000"),
+                                  Me.Long.ToString("0.000000"),
+                                  Me.LocationCount})
+            Return lvi
+
+        End Get
+    End Property
+
 End Class

@@ -6,7 +6,7 @@ End Class
 
 'Photos listview methods
 Partial Class FMain
-    Private _PhotoLVItems As New List(Of LVItem(Of Photo))
+    'Private _PhotoLVItems As New List(Of LVItem(Of Photo))
     Private _PhotosOverlay As New WindowsForms.GMapOverlay("Photos")
 
 
@@ -175,39 +175,135 @@ Partial Class FMain
         RefreshPhotos()
     End Sub
 
+    Private Sub TSBSortPhotosSameFolder_Click(sender As Object, e As EventArgs) Handles TSBSortPhotosSameFolder.Click
+        Dim photos = (From i In _PhotoLVItems Where i.LVItem.Selected).ToArray
+        If photos.Count = 0 Then photos = (From i In _PhotoLVItems Where i.LVItem.ListView Is LVPhotos).ToArray
 
+        Dim fb As New Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog
+
+        fb.IsFolderPicker = True
+
+        If fb.ShowDialog() = DialogResult.OK Then
+
+            WaitWindow.WaitForIt.DoIt("Organizing Photos",
+                Sub(pb)
+                    Try
+                        For i = 0 To photos.Count - 1
+                            pb.Invoke(String.Format("Moving photos. {0} remaining", photos.Count - i), i / photos.Count)
+
+                            Dim p = photos(i)
+
+                            p.Item.MoveToFolder(fb.FileName)
+
+                        Next i
+                    Catch ex As WaitWindow.DoItCanceledException
+
+                    End Try
+                End Sub, Me)
+        End If
+    End Sub
+
+    Private Sub TSBSortPhotosByTakenDate_Click(sender As Object, e As EventArgs) Handles TSBSortPhotosByTakenDate.Click
+        Dim photos = (From i In _PhotoLVItems Where i.LVItem.Selected).ToArray
+        If photos.Count = 0 Then photos = (From i In _PhotoLVItems Where i.LVItem.ListView Is LVPhotos).ToArray
+
+        Dim fb As New Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog
+
+        fb.IsFolderPicker = True
+
+        If fb.ShowDialog() = DialogResult.OK Then
+
+
+            WaitWindow.WaitForIt.DoIt("Organizing Photos",
+            Sub(pb)
+                Try
+                    For i = 0 To photos.Count - 1
+                        pb.Invoke(String.Format("Moving photos. {0} remaining", photos.Count - i), i / photos.Count)
+
+                        Dim p = photos(i)
+
+                        Dim subfolder = IO.Path.Combine(fb.FileName, p.Item.TakenDate.ToString("yyyy-MM-dd"))
+
+                        If Not IO.Directory.Exists(subfolder) Then
+                            IO.Directory.CreateDirectory(subfolder)
+                        End If
+
+                        p.Item.MoveToFolder(subfolder)
+
+                    Next i
+                Catch ex As WaitWindow.DoItCanceledException
+
+                End Try
+            End Sub, Me)
+        End If
+    End Sub
+
+    Private Sub TSBSortPhotosByLocationName_Click(sender As Object, e As EventArgs) Handles TSBSortPhotosByLocationName.Click
+        Dim photos = (From i In _PhotoLVItems Where i.LVItem.Selected And i.Item.LocationCount > 0).ToArray
+        If photos.Count = 0 Then photos = (From i In _PhotoLVItems Where i.LVItem.ListView Is LVPhotos And i.Item.LocationCount > 0).ToArray
+
+        Dim fb As New Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog
+
+        fb.IsFolderPicker = True
+
+        If fb.ShowDialog() = DialogResult.OK Then
+
+
+            WaitWindow.WaitForIt.DoIt("Organizing Photos",
+            Sub(pb)
+                Try
+                    For i = 0 To photos.Count - 1
+                        pb.Invoke(String.Format("Moving photos. {0} remaining", photos.Count - i), i / photos.Count)
+
+                        Dim p = photos(i)
+
+                        Dim subfolder = IO.Path.Combine(fb.FileName, String.Join(", ", From l In p.Item.Locations Select l.LocationName Order By LocationName Ascending Distinct))
+
+                        If Not IO.Directory.Exists(subfolder) Then
+                            IO.Directory.CreateDirectory(subfolder)
+                        End If
+
+                        p.Item.MoveToFolder(subfolder)
+
+                    Next i
+                Catch ex As WaitWindow.DoItCanceledException
+
+                End Try
+            End Sub, Me)
+        End If
+    End Sub
 
     Private Sub TSBRemovePhotos_Click(sender As Object, e As EventArgs) Handles TSBRemovePhotos.Click
         TSBRemoveSelectedPhotos_Click(sender, e)
     End Sub
 
-    ''' <summary>
-    ''' Creates or updates a <see cref="ListViewItem"/> from a <see cref="Photo"/>.
-    ''' </summary>
-    ''' <param name="p">The <see cref="Photo"/> from which to create the <see cref="ListViewItem"/>.</param>
-    ''' <param name="lvItem">Optional. The <see cref="ListViewItem"/> to update. If not specified, a new <see cref="ListViewItem"/> is created.</param>
-    ''' <returns>Returns the <see cref="ListViewItem"/> that was updated or created.</returns>
-    ''' <remarks>The listview is created with four subitems:
-    ''' <list type="bullet">
-    ''' <item><description><see cref="Photo.TakenDate"/></description></item>
-    ''' <item><description><see cref="Photo.Lat"/> formatted to 6 digits of precision</description></item>
-    ''' <item><description><see cref="Photo.Long"/> formatted to 6 digits of precision</description></item>
-    ''' <item><description><see cref="Photo.LocationCount"/></description></item>
-    ''' </list>
-    ''' </remarks>
-    Private Function UpdatePhotoLVItem(p As Photo, Optional lvItem As ListViewItem = Nothing) As ListViewItem
-        Dim lvi = If(lvItem, New ListViewItem)
+    '''' <summary>
+    '''' Creates or updates a <see cref="ListViewItem"/> from a <see cref="Photo"/>.
+    '''' </summary>
+    '''' <param name="p">The <see cref="Photo"/> from which to create the <see cref="ListViewItem"/>.</param>
+    '''' <param name="lvItem">Optional. The <see cref="ListViewItem"/> to update. If not specified, a new <see cref="ListViewItem"/> is created.</param>
+    '''' <returns>Returns the <see cref="ListViewItem"/> that was updated or created.</returns>
+    '''' <remarks>The listview is created with four subitems:
+    '''' <list type="bullet">
+    '''' <item><description><see cref="Photo.TakenDate"/></description></item>
+    '''' <item><description><see cref="Photo.Lat"/> formatted to 6 digits of precision</description></item>
+    '''' <item><description><see cref="Photo.Long"/> formatted to 6 digits of precision</description></item>
+    '''' <item><description><see cref="Photo.LocationCount"/></description></item>
+    '''' </list>
+    '''' </remarks>
+    'Private Function UpdatePhotoLVItem(p As Photo, Optional lvItem As ListViewItem = Nothing) As ListViewItem
+    '    Dim lvi = If(lvItem, New ListViewItem)
 
-        lvi.SubItems.Clear()
-        lvi.Text = p.TakenDate
-        lvi.SubItems.AddRange({
-                              p.Lat.ToString("0.000000"),
-                              p.Long.ToString("0.000000"),
-                              p.LocationCount})
+    '    lvi.SubItems.Clear()
+    '    lvi.Text = p.TakenDate
+    '    lvi.SubItems.AddRange({
+    '                          p.Lat.ToString("0.000000"),
+    '                          p.Long.ToString("0.000000"),
+    '                          p.LocationCount})
 
 
-        Return lvi
-    End Function
+    '    Return lvi
+    'End Function
 
 End Class
 

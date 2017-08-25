@@ -68,4 +68,24 @@
         End Get
     End Property
 
+
+    Public ReadOnly Property ListViewItem As ListViewItem
+        Get
+            Static lvi = New ListViewItem
+
+            lvi.SubItems.Clear()
+            lvi.Text = Me.LocationName
+            lvi.SubItems.AddRange({
+                                  If(Me.Start.HasValue, Me.Start, String.Empty),
+                                  If(Me.End.HasValue, Me.End, String.Empty),
+                                  Me.Address,
+                                  If(Me.Lat.HasValue, Me.Lat.Value.ToString("0.000000"), String.Empty),
+                                  If(Me.Long.HasValue, Me.Long.Value.ToString("0.000000"), String.Empty),
+                                  Me.ID,
+                                  Me.PhotoCount})
+
+            Return lvi
+        End Get
+    End Property
+
 End Class

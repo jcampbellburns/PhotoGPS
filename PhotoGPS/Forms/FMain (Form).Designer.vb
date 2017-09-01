@@ -27,22 +27,19 @@ Partial Class FMain
         Dim FileToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Dim TestToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Dim PANELMap As System.Windows.Forms.Panel
-        Dim TSAddress As System.Windows.Forms.ToolStrip
         Dim ToolStripLabel1 As System.Windows.Forms.ToolStripLabel
         Dim ToolStripspringTextBox1 As PhotoGPS.ToolStripSpringTextBox
         Dim ToolStripButton8 As System.Windows.Forms.ToolStripButton
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FMain))
         Dim ToolStripButton9 As System.Windows.Forms.ToolStripButton
-        Dim TSCoords As System.Windows.Forms.ToolStrip
         Dim ToolStripLabel2 As System.Windows.Forms.ToolStripLabel
         Dim ToolStripspringTextBox2 As PhotoGPS.ToolStripSpringTextBox
         Dim ToolStripButton10 As System.Windows.Forms.ToolStripButton
-        Dim TSMapTools As System.Windows.Forms.ToolStrip
         Dim ToolStripButton6 As System.Windows.Forms.ToolStripButton
         Dim ToolStripButton7 As System.Windows.Forms.ToolStripButton
         Dim CAPTIONMap As PhotoGPS.CaptionBarControl
         Dim SPLITTERMain As System.Windows.Forms.Splitter
-        Dim PANELgps As System.Windows.Forms.Panel
+        Dim PANELProject As System.Windows.Forms.Panel
         Dim ColumnHeader1 As System.Windows.Forms.ColumnHeader
         Dim ColumnHeader2 As System.Windows.Forms.ColumnHeader
         Dim ColumnHeader3 As System.Windows.Forms.ColumnHeader
@@ -50,25 +47,25 @@ Partial Class FMain
         Dim ColumnHeader5 As System.Windows.Forms.ColumnHeader
         Dim ColumnHeader6 As System.Windows.Forms.ColumnHeader
         Dim ColumnHeader7 As System.Windows.Forms.ColumnHeader
-        Dim ToolStrip2 As System.Windows.Forms.ToolStrip
-        Dim CaptionBarControl1 As PhotoGPS.CaptionBarControl
+        Dim CAPTIONLocation As PhotoGPS.CaptionBarControl
         Dim ColumnHeader8 As System.Windows.Forms.ColumnHeader
         Dim ColumnHeader9 As System.Windows.Forms.ColumnHeader
         Dim ColumnHeader10 As System.Windows.Forms.ColumnHeader
-        Dim ToolStrip6 As System.Windows.Forms.ToolStrip
-        Dim CaptionBarControl2 As PhotoGPS.CaptionBarControl
-        Dim ToolStrip1 As System.Windows.Forms.ToolStrip
-        Dim CAPTIONgps As PhotoGPS.CaptionBarControl
-        Dim TSMainTools As System.Windows.Forms.ToolStrip
+        Dim CAPTIONPhotos As PhotoGPS.CaptionBarControl
+        Dim CAPTIONProject As PhotoGPS.CaptionBarControl
         Dim ToolStripButton1 As System.Windows.Forms.ToolStripButton
         Dim ToolStripButton2 As System.Windows.Forms.ToolStripButton
         Dim STATUSMain As System.Windows.Forms.StatusStrip
-        Dim ToolStripStatusLabel1 As System.Windows.Forms.ToolStripStatusLabel
+        Dim SSLStatus As System.Windows.Forms.ToolStripStatusLabel
         Me.MAP = New GMap.NET.WindowsForms.GMapControl()
+        Me.TSAddress = New System.Windows.Forms.ToolStrip()
+        Me.TSCoords = New System.Windows.Forms.ToolStrip()
+        Me.TSMap = New System.Windows.Forms.ToolStrip()
         Me.Splitter1 = New System.Windows.Forms.Splitter()
-        Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.PANELLocations = New System.Windows.Forms.Panel()
         Me.LVLocations = New System.Windows.Forms.ListView()
         Me.ColumnHeader13 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.TSLocations = New System.Windows.Forms.ToolStrip()
         Me.TSBImportLocations = New System.Windows.Forms.ToolStripButton()
         Me.TSBExportLocations = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
@@ -77,8 +74,9 @@ Partial Class FMain
         Me.TSBEditLocation = New System.Windows.Forms.ToolStripButton()
         Me.TSBRemoveLocations = New System.Windows.Forms.ToolStripButton()
         Me.TSBAddLocation = New System.Windows.Forms.ToolStripButton()
-        Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.PANELPhotos = New System.Windows.Forms.Panel()
         Me.LVPhotos = New System.Windows.Forms.ListView()
+        Me.TSPhotos = New System.Windows.Forms.ToolStrip()
         Me.TSBRemovePhotos = New System.Windows.Forms.ToolStripSplitButton()
         Me.TSBRemoveSelectedPhotos = New System.Windows.Forms.ToolStripMenuItem()
         Me.TSBRemovePhotosNoLongerAvailable = New System.Windows.Forms.ToolStripMenuItem()
@@ -88,36 +86,35 @@ Partial Class FMain
         Me.TSBAddPhotosFolder = New System.Windows.Forms.ToolStripMenuItem()
         Me.TSBAddPhotosFile = New System.Windows.Forms.ToolStripMenuItem()
         Me.TSBRenamePhotoFiles = New System.Windows.Forms.ToolStripButton()
-        Me.TSBSortPhotos = New System.Windows.Forms.ToolStripDropDownButton()
+        Me.TSBSortPhotos = New System.Windows.Forms.ToolStripSplitButton()
         Me.TSBSortPhotosByLocationName = New System.Windows.Forms.ToolStripMenuItem()
         Me.TSBSortPhotosByTakenDate = New System.Windows.Forms.ToolStripMenuItem()
         Me.TSBSortPhotosSameFolder = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.TSProject = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton11 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton14 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
-        Me.ToolStripProgressBar1 = New System.Windows.Forms.ToolStripProgressBar()
-        Me.ToolStripDropDownButton1 = New System.Windows.Forms.ToolStripButton()
+        Me.TSMain = New System.Windows.Forms.ToolStrip()
+        Me.SSPTaskProgress = New System.Windows.Forms.ToolStripProgressBar()
+        Me.SSBStop = New System.Windows.Forms.ToolStripButton()
         Me.ILFolder = New System.Windows.Forms.ImageList(Me.components)
         MENUMain = New System.Windows.Forms.MenuStrip()
         FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         TestToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         PANELMap = New System.Windows.Forms.Panel()
-        TSAddress = New System.Windows.Forms.ToolStrip()
         ToolStripLabel1 = New System.Windows.Forms.ToolStripLabel()
         ToolStripspringTextBox1 = New PhotoGPS.ToolStripSpringTextBox()
         ToolStripButton8 = New System.Windows.Forms.ToolStripButton()
         ToolStripButton9 = New System.Windows.Forms.ToolStripButton()
-        TSCoords = New System.Windows.Forms.ToolStrip()
         ToolStripLabel2 = New System.Windows.Forms.ToolStripLabel()
         ToolStripspringTextBox2 = New PhotoGPS.ToolStripSpringTextBox()
         ToolStripButton10 = New System.Windows.Forms.ToolStripButton()
-        TSMapTools = New System.Windows.Forms.ToolStrip()
         ToolStripButton6 = New System.Windows.Forms.ToolStripButton()
         ToolStripButton7 = New System.Windows.Forms.ToolStripButton()
         CAPTIONMap = New PhotoGPS.CaptionBarControl()
         SPLITTERMain = New System.Windows.Forms.Splitter()
-        PANELgps = New System.Windows.Forms.Panel()
+        PANELProject = New System.Windows.Forms.Panel()
         ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ColumnHeader2 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ColumnHeader3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
@@ -125,32 +122,28 @@ Partial Class FMain
         ColumnHeader5 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ColumnHeader6 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ColumnHeader7 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        ToolStrip2 = New System.Windows.Forms.ToolStrip()
-        CaptionBarControl1 = New PhotoGPS.CaptionBarControl()
+        CAPTIONLocation = New PhotoGPS.CaptionBarControl()
         ColumnHeader8 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ColumnHeader9 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         ColumnHeader10 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        ToolStrip6 = New System.Windows.Forms.ToolStrip()
-        CaptionBarControl2 = New PhotoGPS.CaptionBarControl()
-        ToolStrip1 = New System.Windows.Forms.ToolStrip()
-        CAPTIONgps = New PhotoGPS.CaptionBarControl()
-        TSMainTools = New System.Windows.Forms.ToolStrip()
+        CAPTIONPhotos = New PhotoGPS.CaptionBarControl()
+        CAPTIONProject = New PhotoGPS.CaptionBarControl()
         ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
         STATUSMain = New System.Windows.Forms.StatusStrip()
-        ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
+        SSLStatus = New System.Windows.Forms.ToolStripStatusLabel()
         MENUMain.SuspendLayout()
         PANELMap.SuspendLayout()
-        TSAddress.SuspendLayout()
-        TSCoords.SuspendLayout()
-        TSMapTools.SuspendLayout()
-        PANELgps.SuspendLayout()
-        Me.Panel1.SuspendLayout()
-        ToolStrip2.SuspendLayout()
-        Me.Panel2.SuspendLayout()
-        ToolStrip6.SuspendLayout()
-        ToolStrip1.SuspendLayout()
-        TSMainTools.SuspendLayout()
+        Me.TSAddress.SuspendLayout()
+        Me.TSCoords.SuspendLayout()
+        Me.TSMap.SuspendLayout()
+        PANELProject.SuspendLayout()
+        Me.PANELLocations.SuspendLayout()
+        Me.TSLocations.SuspendLayout()
+        Me.PANELPhotos.SuspendLayout()
+        Me.TSPhotos.SuspendLayout()
+        Me.TSProject.SuspendLayout()
+        Me.TSMain.SuspendLayout()
         STATUSMain.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -179,9 +172,9 @@ Partial Class FMain
         'PANELMap
         '
         PANELMap.Controls.Add(Me.MAP)
-        PANELMap.Controls.Add(TSAddress)
-        PANELMap.Controls.Add(TSCoords)
-        PANELMap.Controls.Add(TSMapTools)
+        PANELMap.Controls.Add(Me.TSAddress)
+        PANELMap.Controls.Add(Me.TSCoords)
+        PANELMap.Controls.Add(Me.TSMap)
         PANELMap.Controls.Add(CAPTIONMap)
         PANELMap.Dock = System.Windows.Forms.DockStyle.Fill
         PANELMap.Location = New System.Drawing.Point(742, 49)
@@ -219,15 +212,15 @@ Partial Class FMain
         '
         'TSAddress
         '
-        TSAddress.Dock = System.Windows.Forms.DockStyle.Bottom
-        TSAddress.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        TSAddress.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripLabel1, ToolStripspringTextBox1, ToolStripButton8, ToolStripButton9})
-        TSAddress.Location = New System.Drawing.Point(0, 466)
-        TSAddress.Name = "TSAddress"
-        TSAddress.Size = New System.Drawing.Size(660, 25)
-        TSAddress.Stretch = True
-        TSAddress.TabIndex = 4
-        TSAddress.Text = "ToolStrip5"
+        Me.TSAddress.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.TSAddress.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.TSAddress.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripLabel1, ToolStripspringTextBox1, ToolStripButton8, ToolStripButton9})
+        Me.TSAddress.Location = New System.Drawing.Point(0, 466)
+        Me.TSAddress.Name = "TSAddress"
+        Me.TSAddress.Size = New System.Drawing.Size(660, 25)
+        Me.TSAddress.Stretch = True
+        Me.TSAddress.TabIndex = 4
+        Me.TSAddress.Text = "ToolStrip5"
         '
         'ToolStripLabel1
         '
@@ -264,15 +257,15 @@ Partial Class FMain
         '
         'TSCoords
         '
-        TSCoords.Dock = System.Windows.Forms.DockStyle.Bottom
-        TSCoords.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        TSCoords.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripLabel2, ToolStripspringTextBox2, ToolStripButton10})
-        TSCoords.Location = New System.Drawing.Point(0, 491)
-        TSCoords.Name = "TSCoords"
-        TSCoords.Size = New System.Drawing.Size(660, 25)
-        TSCoords.Stretch = True
-        TSCoords.TabIndex = 3
-        TSCoords.Text = "ToolStrip4"
+        Me.TSCoords.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.TSCoords.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.TSCoords.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripLabel2, ToolStripspringTextBox2, ToolStripButton10})
+        Me.TSCoords.Location = New System.Drawing.Point(0, 491)
+        Me.TSCoords.Name = "TSCoords"
+        Me.TSCoords.Size = New System.Drawing.Size(660, 25)
+        Me.TSCoords.Stretch = True
+        Me.TSCoords.TabIndex = 3
+        Me.TSCoords.Text = "ToolStrip4"
         '
         'ToolStripLabel2
         '
@@ -296,15 +289,15 @@ Partial Class FMain
         ToolStripButton10.Text = "ToolStripButton10"
         ToolStripButton10.ToolTipText = "Open coordinates in Google maps"
         '
-        'TSMapTools
+        'TSMap
         '
-        TSMapTools.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        TSMapTools.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripButton6, ToolStripButton7})
-        TSMapTools.Location = New System.Drawing.Point(0, 13)
-        TSMapTools.Name = "TSMapTools"
-        TSMapTools.Size = New System.Drawing.Size(660, 25)
-        TSMapTools.TabIndex = 1
-        TSMapTools.Text = "ToolStrip3"
+        Me.TSMap.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.TSMap.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripButton6, ToolStripButton7})
+        Me.TSMap.Location = New System.Drawing.Point(0, 13)
+        Me.TSMap.Name = "TSMap"
+        Me.TSMap.Size = New System.Drawing.Size(660, 25)
+        Me.TSMap.TabIndex = 1
+        Me.TSMap.Text = "ToolStrip3"
         '
         'ToolStripButton6
         '
@@ -347,18 +340,18 @@ Partial Class FMain
         SPLITTERMain.TabIndex = 4
         SPLITTERMain.TabStop = False
         '
-        'PANELgps
+        'PANELProject
         '
-        PANELgps.Controls.Add(Me.Splitter1)
-        PANELgps.Controls.Add(Me.Panel1)
-        PANELgps.Controls.Add(Me.Panel2)
-        PANELgps.Controls.Add(ToolStrip1)
-        PANELgps.Controls.Add(CAPTIONgps)
-        PANELgps.Dock = System.Windows.Forms.DockStyle.Left
-        PANELgps.Location = New System.Drawing.Point(0, 49)
-        PANELgps.Name = "PANELgps"
-        PANELgps.Size = New System.Drawing.Size(739, 516)
-        PANELgps.TabIndex = 3
+        PANELProject.Controls.Add(Me.Splitter1)
+        PANELProject.Controls.Add(Me.PANELLocations)
+        PANELProject.Controls.Add(Me.PANELPhotos)
+        PANELProject.Controls.Add(Me.TSProject)
+        PANELProject.Controls.Add(CAPTIONProject)
+        PANELProject.Dock = System.Windows.Forms.DockStyle.Left
+        PANELProject.Location = New System.Drawing.Point(0, 49)
+        PANELProject.Name = "PANELProject"
+        PANELProject.Size = New System.Drawing.Size(739, 516)
+        PANELProject.TabIndex = 3
         '
         'Splitter1
         '
@@ -369,16 +362,16 @@ Partial Class FMain
         Me.Splitter1.TabIndex = 5
         Me.Splitter1.TabStop = False
         '
-        'Panel1
+        'PANELLocations
         '
-        Me.Panel1.Controls.Add(Me.LVLocations)
-        Me.Panel1.Controls.Add(ToolStrip2)
-        Me.Panel1.Controls.Add(CaptionBarControl1)
-        Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Panel1.Location = New System.Drawing.Point(0, 38)
-        Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(424, 478)
-        Me.Panel1.TabIndex = 4
+        Me.PANELLocations.Controls.Add(Me.LVLocations)
+        Me.PANELLocations.Controls.Add(Me.TSLocations)
+        Me.PANELLocations.Controls.Add(CAPTIONLocation)
+        Me.PANELLocations.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.PANELLocations.Location = New System.Drawing.Point(0, 38)
+        Me.PANELLocations.Name = "PANELLocations"
+        Me.PANELLocations.Size = New System.Drawing.Size(424, 478)
+        Me.PANELLocations.TabIndex = 4
         '
         'LVLocations
         '
@@ -388,7 +381,6 @@ Partial Class FMain
         Me.LVLocations.FullRowSelect = True
         Me.LVLocations.HideSelection = False
         Me.LVLocations.Location = New System.Drawing.Point(0, 38)
-        Me.LVLocations.MultiSelect = False
         Me.LVLocations.Name = "LVLocations"
         Me.LVLocations.ShowGroups = False
         Me.LVLocations.Size = New System.Drawing.Size(424, 440)
@@ -429,15 +421,15 @@ Partial Class FMain
         '
         Me.ColumnHeader13.Text = "Photo Count"
         '
-        'ToolStrip2
+        'TSLocations
         '
-        ToolStrip2.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBImportLocations, Me.TSBExportLocations, Me.ToolStripSeparator1, Me.TSBLocationsVisible, Me.TSBGetLocationCoords, Me.TSBEditLocation, Me.TSBRemoveLocations, Me.TSBAddLocation})
-        ToolStrip2.Location = New System.Drawing.Point(0, 13)
-        ToolStrip2.Name = "ToolStrip2"
-        ToolStrip2.Size = New System.Drawing.Size(424, 25)
-        ToolStrip2.TabIndex = 1
-        ToolStrip2.Text = "ToolStrip2"
+        Me.TSLocations.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.TSLocations.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBImportLocations, Me.TSBExportLocations, Me.ToolStripSeparator1, Me.TSBLocationsVisible, Me.TSBGetLocationCoords, Me.TSBEditLocation, Me.TSBRemoveLocations, Me.TSBAddLocation})
+        Me.TSLocations.Location = New System.Drawing.Point(0, 13)
+        Me.TSLocations.Name = "TSLocations"
+        Me.TSLocations.Size = New System.Drawing.Size(424, 25)
+        Me.TSLocations.TabIndex = 1
+        Me.TSLocations.Text = "ToolStrip2"
         '
         'TSBImportLocations
         '
@@ -518,31 +510,31 @@ Partial Class FMain
         Me.TSBAddLocation.Size = New System.Drawing.Size(23, 22)
         Me.TSBAddLocation.Text = "ToolStripButton11"
         '
-        'CaptionBarControl1
+        'CAPTIONLocation
         '
-        CaptionBarControl1.AutoEllipsis = True
-        CaptionBarControl1.AutoSize = True
-        CaptionBarControl1.BackColor = System.Drawing.SystemColors.ActiveCaption
-        CaptionBarControl1.Dock = System.Windows.Forms.DockStyle.Top
-        CaptionBarControl1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText
-        CaptionBarControl1.Location = New System.Drawing.Point(0, 0)
-        CaptionBarControl1.Name = "CaptionBarControl1"
-        CaptionBarControl1.Size = New System.Drawing.Size(424, 13)
-        CaptionBarControl1.TabIndex = 5
-        CaptionBarControl1.Text = "Locations"
-        CaptionBarControl1.TextAlign = System.Drawing.ContentAlignment.TopCenter
-        CaptionBarControl1.TrackFocus = PANELgps
+        CAPTIONLocation.AutoEllipsis = True
+        CAPTIONLocation.AutoSize = True
+        CAPTIONLocation.BackColor = System.Drawing.SystemColors.ActiveCaption
+        CAPTIONLocation.Dock = System.Windows.Forms.DockStyle.Top
+        CAPTIONLocation.ForeColor = System.Drawing.SystemColors.ActiveCaptionText
+        CAPTIONLocation.Location = New System.Drawing.Point(0, 0)
+        CAPTIONLocation.Name = "CAPTIONLocation"
+        CAPTIONLocation.Size = New System.Drawing.Size(424, 13)
+        CAPTIONLocation.TabIndex = 5
+        CAPTIONLocation.Text = "Locations"
+        CAPTIONLocation.TextAlign = System.Drawing.ContentAlignment.TopCenter
+        CAPTIONLocation.TrackFocus = Me.PANELLocations
         '
-        'Panel2
+        'PANELPhotos
         '
-        Me.Panel2.Controls.Add(Me.LVPhotos)
-        Me.Panel2.Controls.Add(ToolStrip6)
-        Me.Panel2.Controls.Add(CaptionBarControl2)
-        Me.Panel2.Dock = System.Windows.Forms.DockStyle.Right
-        Me.Panel2.Location = New System.Drawing.Point(424, 38)
-        Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(315, 478)
-        Me.Panel2.TabIndex = 6
+        Me.PANELPhotos.Controls.Add(Me.LVPhotos)
+        Me.PANELPhotos.Controls.Add(Me.TSPhotos)
+        Me.PANELPhotos.Controls.Add(CAPTIONPhotos)
+        Me.PANELPhotos.Dock = System.Windows.Forms.DockStyle.Right
+        Me.PANELPhotos.Location = New System.Drawing.Point(424, 38)
+        Me.PANELPhotos.Name = "PANELPhotos"
+        Me.PANELPhotos.Size = New System.Drawing.Size(315, 478)
+        Me.PANELPhotos.TabIndex = 6
         '
         'LVPhotos
         '
@@ -569,14 +561,14 @@ Partial Class FMain
         '
         ColumnHeader10.Text = "Longitude"
         '
-        'ToolStrip6
+        'TSPhotos
         '
-        ToolStrip6.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        ToolStrip6.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBRemovePhotos, Me.TBSAddPhotos, Me.TSBRenamePhotoFiles, Me.TSBSortPhotos})
-        ToolStrip6.Location = New System.Drawing.Point(0, 13)
-        ToolStrip6.Name = "ToolStrip6"
-        ToolStrip6.Size = New System.Drawing.Size(315, 25)
-        ToolStrip6.TabIndex = 3
+        Me.TSPhotos.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.TSPhotos.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBRemovePhotos, Me.TBSAddPhotos, Me.TSBRenamePhotoFiles, Me.TSBSortPhotos})
+        Me.TSPhotos.Location = New System.Drawing.Point(0, 13)
+        Me.TSPhotos.Name = "TSPhotos"
+        Me.TSPhotos.Size = New System.Drawing.Size(315, 25)
+        Me.TSPhotos.TabIndex = 3
         '
         'TSBRemovePhotos
         '
@@ -650,7 +642,7 @@ Partial Class FMain
         Me.TSBSortPhotos.Image = CType(resources.GetObject("TSBSortPhotos.Image"), System.Drawing.Image)
         Me.TSBSortPhotos.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.TSBSortPhotos.Name = "TSBSortPhotos"
-        Me.TSBSortPhotos.Size = New System.Drawing.Size(107, 22)
+        Me.TSBSortPhotos.Size = New System.Drawing.Size(110, 22)
         Me.TSBSortPhotos.Text = "Sort to Folder"
         '
         'TSBSortPhotosByLocationName
@@ -677,30 +669,30 @@ Partial Class FMain
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
         Me.ToolStripMenuItem1.Size = New System.Drawing.Size(197, 6)
         '
-        'CaptionBarControl2
+        'CAPTIONPhotos
         '
-        CaptionBarControl2.AutoEllipsis = True
-        CaptionBarControl2.AutoSize = True
-        CaptionBarControl2.BackColor = System.Drawing.SystemColors.ActiveCaption
-        CaptionBarControl2.Dock = System.Windows.Forms.DockStyle.Top
-        CaptionBarControl2.ForeColor = System.Drawing.SystemColors.ActiveCaptionText
-        CaptionBarControl2.Location = New System.Drawing.Point(0, 0)
-        CaptionBarControl2.Name = "CaptionBarControl2"
-        CaptionBarControl2.Size = New System.Drawing.Size(315, 13)
-        CaptionBarControl2.TabIndex = 6
-        CaptionBarControl2.Text = "Photos"
-        CaptionBarControl2.TextAlign = System.Drawing.ContentAlignment.TopCenter
-        CaptionBarControl2.TrackFocus = PANELgps
+        CAPTIONPhotos.AutoEllipsis = True
+        CAPTIONPhotos.AutoSize = True
+        CAPTIONPhotos.BackColor = System.Drawing.SystemColors.ActiveCaption
+        CAPTIONPhotos.Dock = System.Windows.Forms.DockStyle.Top
+        CAPTIONPhotos.ForeColor = System.Drawing.SystemColors.ActiveCaptionText
+        CAPTIONPhotos.Location = New System.Drawing.Point(0, 0)
+        CAPTIONPhotos.Name = "CAPTIONPhotos"
+        CAPTIONPhotos.Size = New System.Drawing.Size(315, 13)
+        CAPTIONPhotos.TabIndex = 6
+        CAPTIONPhotos.Text = "Photos"
+        CAPTIONPhotos.TextAlign = System.Drawing.ContentAlignment.TopCenter
+        CAPTIONPhotos.TrackFocus = Me.PANELPhotos
         '
-        'ToolStrip1
+        'TSProject
         '
-        ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton11, Me.ToolStripButton14, Me.ToolStripSeparator4})
-        ToolStrip1.Location = New System.Drawing.Point(0, 13)
-        ToolStrip1.Name = "ToolStrip1"
-        ToolStrip1.Size = New System.Drawing.Size(739, 25)
-        ToolStrip1.TabIndex = 5
-        ToolStrip1.Text = "ToolStrip1"
+        Me.TSProject.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.TSProject.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton11, Me.ToolStripButton14, Me.ToolStripSeparator4})
+        Me.TSProject.Location = New System.Drawing.Point(0, 13)
+        Me.TSProject.Name = "TSProject"
+        Me.TSProject.Size = New System.Drawing.Size(739, 25)
+        Me.TSProject.TabIndex = 5
+        Me.TSProject.Text = "ToolStrip1"
         '
         'ToolStripButton11
         '
@@ -727,29 +719,29 @@ Partial Class FMain
         Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
         Me.ToolStripSeparator4.Size = New System.Drawing.Size(6, 25)
         '
-        'CAPTIONgps
+        'CAPTIONProject
         '
-        CAPTIONgps.AutoEllipsis = True
-        CAPTIONgps.AutoSize = True
-        CAPTIONgps.BackColor = System.Drawing.SystemColors.ActiveCaption
-        CAPTIONgps.Dock = System.Windows.Forms.DockStyle.Top
-        CAPTIONgps.ForeColor = System.Drawing.SystemColors.ActiveCaptionText
-        CAPTIONgps.Location = New System.Drawing.Point(0, 0)
-        CAPTIONgps.Name = "CAPTIONgps"
-        CAPTIONgps.Size = New System.Drawing.Size(739, 13)
-        CAPTIONgps.TabIndex = 0
-        CAPTIONgps.Text = "Project"
-        CAPTIONgps.TextAlign = System.Drawing.ContentAlignment.TopCenter
-        CAPTIONgps.TrackFocus = PANELgps
+        CAPTIONProject.AutoEllipsis = True
+        CAPTIONProject.AutoSize = True
+        CAPTIONProject.BackColor = System.Drawing.SystemColors.ActiveCaption
+        CAPTIONProject.Dock = System.Windows.Forms.DockStyle.Top
+        CAPTIONProject.ForeColor = System.Drawing.SystemColors.ActiveCaptionText
+        CAPTIONProject.Location = New System.Drawing.Point(0, 0)
+        CAPTIONProject.Name = "CAPTIONProject"
+        CAPTIONProject.Size = New System.Drawing.Size(739, 13)
+        CAPTIONProject.TabIndex = 0
+        CAPTIONProject.Text = "Project"
+        CAPTIONProject.TextAlign = System.Drawing.ContentAlignment.TopCenter
+        CAPTIONProject.TrackFocus = PANELProject
         '
-        'TSMainTools
+        'TSMain
         '
-        TSMainTools.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        TSMainTools.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripButton1, ToolStripButton2})
-        TSMainTools.Location = New System.Drawing.Point(0, 24)
-        TSMainTools.Name = "TSMainTools"
-        TSMainTools.Size = New System.Drawing.Size(1402, 25)
-        TSMainTools.TabIndex = 0
+        Me.TSMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.TSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripButton1, ToolStripButton2})
+        Me.TSMain.Location = New System.Drawing.Point(0, 24)
+        Me.TSMain.Name = "TSMain"
+        Me.TSMain.Size = New System.Drawing.Size(1402, 25)
+        Me.TSMain.TabIndex = 0
         '
         'ToolStripButton1
         '
@@ -771,32 +763,34 @@ Partial Class FMain
         '
         'STATUSMain
         '
-        STATUSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripStatusLabel1, Me.ToolStripProgressBar1, Me.ToolStripDropDownButton1})
+        STATUSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {SSLStatus, Me.SSPTaskProgress, Me.SSBStop})
         STATUSMain.Location = New System.Drawing.Point(0, 565)
         STATUSMain.Name = "STATUSMain"
         STATUSMain.Size = New System.Drawing.Size(1402, 22)
         STATUSMain.TabIndex = 5
         STATUSMain.Text = "StatusStrip1"
         '
-        'ToolStripStatusLabel1
+        'SSLStatus
         '
-        ToolStripStatusLabel1.Name = "ToolStripStatusLabel1"
-        ToolStripStatusLabel1.Size = New System.Drawing.Size(39, 17)
-        ToolStripStatusLabel1.Text = "Ready"
+        SSLStatus.Name = "SSLStatus"
+        SSLStatus.Size = New System.Drawing.Size(39, 17)
+        SSLStatus.Text = "Ready"
         '
-        'ToolStripProgressBar1
+        'SSPTaskProgress
         '
-        Me.ToolStripProgressBar1.Name = "ToolStripProgressBar1"
-        Me.ToolStripProgressBar1.Size = New System.Drawing.Size(100, 16)
+        Me.SSPTaskProgress.Name = "SSPTaskProgress"
+        Me.SSPTaskProgress.Size = New System.Drawing.Size(100, 16)
+        Me.SSPTaskProgress.Visible = False
         '
-        'ToolStripDropDownButton1
+        'SSBStop
         '
-        Me.ToolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripDropDownButton1.Image = CType(resources.GetObject("ToolStripDropDownButton1.Image"), System.Drawing.Image)
-        Me.ToolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripDropDownButton1.Name = "ToolStripDropDownButton1"
-        Me.ToolStripDropDownButton1.Size = New System.Drawing.Size(23, 20)
-        Me.ToolStripDropDownButton1.Text = "ToolStripDropDownButton1"
+        Me.SSBStop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.SSBStop.Image = CType(resources.GetObject("SSBStop.Image"), System.Drawing.Image)
+        Me.SSBStop.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.SSBStop.Name = "SSBStop"
+        Me.SSBStop.Size = New System.Drawing.Size(23, 20)
+        Me.SSBStop.Text = "ToolStripDropDownButton1"
+        Me.SSBStop.Visible = False
         '
         'ILFolder
         '
@@ -812,9 +806,9 @@ Partial Class FMain
         Me.ClientSize = New System.Drawing.Size(1402, 587)
         Me.Controls.Add(PANELMap)
         Me.Controls.Add(SPLITTERMain)
-        Me.Controls.Add(PANELgps)
+        Me.Controls.Add(PANELProject)
         Me.Controls.Add(STATUSMain)
-        Me.Controls.Add(TSMainTools)
+        Me.Controls.Add(Me.TSMain)
         Me.Controls.Add(MENUMain)
         Me.MainMenuStrip = MENUMain
         Me.MinimumSize = New System.Drawing.Size(570, 340)
@@ -824,26 +818,26 @@ Partial Class FMain
         MENUMain.PerformLayout()
         PANELMap.ResumeLayout(False)
         PANELMap.PerformLayout()
-        TSAddress.ResumeLayout(False)
-        TSAddress.PerformLayout()
-        TSCoords.ResumeLayout(False)
-        TSCoords.PerformLayout()
-        TSMapTools.ResumeLayout(False)
-        TSMapTools.PerformLayout()
-        PANELgps.ResumeLayout(False)
-        PANELgps.PerformLayout()
-        Me.Panel1.ResumeLayout(False)
-        Me.Panel1.PerformLayout()
-        ToolStrip2.ResumeLayout(False)
-        ToolStrip2.PerformLayout()
-        Me.Panel2.ResumeLayout(False)
-        Me.Panel2.PerformLayout()
-        ToolStrip6.ResumeLayout(False)
-        ToolStrip6.PerformLayout()
-        ToolStrip1.ResumeLayout(False)
-        ToolStrip1.PerformLayout()
-        TSMainTools.ResumeLayout(False)
-        TSMainTools.PerformLayout()
+        Me.TSAddress.ResumeLayout(False)
+        Me.TSAddress.PerformLayout()
+        Me.TSCoords.ResumeLayout(False)
+        Me.TSCoords.PerformLayout()
+        Me.TSMap.ResumeLayout(False)
+        Me.TSMap.PerformLayout()
+        PANELProject.ResumeLayout(False)
+        PANELProject.PerformLayout()
+        Me.PANELLocations.ResumeLayout(False)
+        Me.PANELLocations.PerformLayout()
+        Me.TSLocations.ResumeLayout(False)
+        Me.TSLocations.PerformLayout()
+        Me.PANELPhotos.ResumeLayout(False)
+        Me.PANELPhotos.PerformLayout()
+        Me.TSPhotos.ResumeLayout(False)
+        Me.TSPhotos.PerformLayout()
+        Me.TSProject.ResumeLayout(False)
+        Me.TSProject.PerformLayout()
+        Me.TSMain.ResumeLayout(False)
+        Me.TSMain.PerformLayout()
         STATUSMain.ResumeLayout(False)
         STATUSMain.PerformLayout()
         Me.ResumeLayout(False)
@@ -857,8 +851,8 @@ Partial Class FMain
 
     Friend WithEvents MAP As GMap.NET.WindowsForms.GMapControl
     Friend WithEvents ILFolder As ImageList
-    Friend WithEvents Panel1 As Panel
-    Friend WithEvents Panel2 As Panel
+    Friend WithEvents PANELLocations As Panel
+    Friend WithEvents PANELPhotos As Panel
     Friend WithEvents Splitter1 As Splitter
     Friend WithEvents TSBImportLocations As ToolStripButton
     Friend WithEvents TSBExportLocations As ToolStripButton
@@ -867,8 +861,8 @@ Partial Class FMain
     Friend WithEvents TSBGetLocationCoords As ToolStripButton
     Friend WithEvents LVLocations As ListView
     Friend WithEvents LVPhotos As ListView
-    Friend WithEvents ToolStripProgressBar1 As ToolStripProgressBar
-    Friend WithEvents ToolStripDropDownButton1 As ToolStripButton
+    Friend WithEvents SSPTaskProgress As ToolStripProgressBar
+    Friend WithEvents SSBStop As ToolStripButton
     Friend WithEvents ColumnHeader13 As ColumnHeader
     Friend WithEvents TSBAddPhotosFolder As ToolStripMenuItem
     Friend WithEvents TSBAddPhotosFile As ToolStripMenuItem
@@ -885,9 +879,16 @@ Partial Class FMain
     Friend WithEvents TSBAddLocation As ToolStripButton
     Friend WithEvents TBSAddPhotos As ToolStripSplitButton
     Friend WithEvents TSBRemovePhotos As ToolStripSplitButton
-    Friend WithEvents TSBSortPhotos As ToolStripDropDownButton
-    Friend WithEvents TSBSortPhotosSameFolder As ToolStripMenuItem
+    Friend WithEvents TSBSortPhotos As ToolStripSplitButton
     Friend WithEvents TSBSortPhotosByLocationName As ToolStripMenuItem
     Friend WithEvents TSBSortPhotosByTakenDate As ToolStripMenuItem
+    Friend WithEvents TSBSortPhotosSameFolder As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem1 As ToolStripSeparator
+    Friend WithEvents TSPhotos As ToolStrip
+    Friend WithEvents TSLocations As ToolStrip
+    Friend WithEvents TSAddress As ToolStrip
+    Friend WithEvents TSCoords As ToolStrip
+    Friend WithEvents TSMap As ToolStrip
+    Friend WithEvents TSProject As ToolStrip
+    Friend WithEvents TSMain As ToolStrip
 End Class

@@ -1,5 +1,5 @@
 ﻿Public Class Photo
-    Public Shared ReadOnly SupportedExtensions() As String = {"*.jpg", "*.jpeg", "*.jpe"} 'Best practices is to use a constant but you can't have a constant array...
+    Public Shared ReadOnly SupportedExtensions() As String = {".jpg", ".jpeg", ".jpe"} 'Best practices is to use a constant but you can't have a constant array...
 
     Public Property GPS As GMap.NET.PointLatLng
         Get
@@ -84,7 +84,7 @@
     ''' Generate a <see cref="Photo"/> from a photo file.
     ''' </summary>
     ''' <param name="File">The <see cref="IO.FileInfo"/> from which to create the <see cref="Photo"/>.</param>
-    ''' <returns>A <see cref="Photo"/> representing the file speciifed by <paramref name="File"/> or <c>Nothing</c> if the file metadate could not be read.</returns>
+    ''' <returns>A <see cref="Photo"/> representing the file specified by <paramref name="File"/> or <c>Nothing</c> if the file metadate could not be read.</returns>
     ''' <remarks>This method currently uses the file's extension to differentiate file types. Supported extension are .JPG, .JPEG, and .JPE. While there are plans to include support for other formats, such as MP4, support is only available for JPEG photos at this time.</remarks>
     Shared Function FromFile(File As IO.FileInfo) As Photo
         Dim res As New Photo
@@ -92,12 +92,30 @@
         Return res.RefreshMetadata(File)
     End Function
 
+    '''' <summary>
+    '''' Generate an <see cref="IEnumerable(Of Photo)"/> from a list of photo files.
+    '''' </summary>
+    '''' <param name="Files">The <see cref="IEnumerable(Of IO.FileInfo)"/> from which to create the <see cref="IEnumerable(Of Photo)"/>.</param>
+    '''' <returns>An <see cref="IEnumerable(Of Photo)"/> representing the files specified by <see cref="IEnumerable(Of IO.FileInfo)"/>. Only files from which metadate could be read will be contained in the returned list. The list will contain unique items even if a file is specified more than once.</returns>
+    '''' <remarks>This method currently uses the file's extension to differentiate file types. Supported extension are .JPG, .JPEG, and .JPE. While there are plans to include support for other formats, such as MP4, support is only available for JPEG photos at this time.</remarks>
+    'Shared Function FromFiles(Files As IEnumerable(Of IO.FileInfo)) As IEnumerable(Of Photo)
+    '    Dim f = Files.Distinct.ToList
+
+
+    '    Dim res = (From i In f Select Photo.FromFile(i)).SkipWhile(Function(p) p Is Nothing)
+
+
+    '    Return res
+
+    'End Function
+
+    Public Project As Project
     <CSVField(CSVFieldName:="Latitude")> Public Lat As Double
     <CSVField(CSVFieldName:="Longitude")> Public [Long] As Double
     <CSVField()> Public Filename As String
     <CSVField()> Public Filedate As Date
     <CSVField()> Public TakenDate As Date
-    <CSVField()> Public FileSize As ULong
+    <CSVField()> Public FileSize As Long
 
     Public ReadOnly Property LocationCount As Integer
         Get
@@ -109,7 +127,11 @@
         End Get
     End Property
 
-    Public Locations As New List(Of Location)
+    Public ReadOnly Property Locations As IEnumerable(Of Location)
+        Get
+            Return From i In Project.Locations Where i.Photos.Contains(Me) Distinct
+        End Get
+    End Property
 
     ''' <summary>
     ''' Renames the file this <see cref="Photo"/> is associated with and updates the Creation and LastWrite dates to match <see cref="Photo.TakenDate"/>.
@@ -147,10 +169,14 @@
             lvi.SubItems.AddRange({
                                   Me.Lat.ToString("0.000000"),
                                   Me.Long.ToString("0.000000"),
-                                  Me.LocationCount})
+                                  Me.LocationCount.ToString})
             Return lvi
 
         End Get
     End Property
+
+
+
+
 
 End Class

@@ -17,19 +17,19 @@ Public NotInheritable Class CSVSerializer(Of t As New)
         End Get
     End Property
 
-    Shared Function Serialize(objects As IEnumerable(Of t), Optional PostBackFunction As WaitWindow.PostBack = Nothing) As String
-        Try
-            'set up result stringbuilder
-            'add column headers to csv result
-            'cycle through all the objects in the collection
-            '   cycle through all the fields in _CSVColumnHeaders
-            '       use reflection to pull the value
-            '       convert to string
-            '       append to current row
-            '   append crlf and most recent row to end of csv result
-            'return csv result
+    Shared Function Serialize(objects As IEnumerable(Of t)) As String
 
-            Dim csvResult As New Text.StringBuilder
+        'set up result stringbuilder
+        'add column headers to csv result
+        'cycle through all the objects in the collection
+        '   cycle through all the fields in _CSVColumnHeaders
+        '       use reflection to pull the value
+        '       convert to string
+        '       append to current row
+        '   append crlf and most recent row to end of csv result
+        'return csv result
+
+        Dim csvResult As New Text.StringBuilder
             Dim csvRow As New Text.StringBuilder
 
             Dim objList = objects.ToList
@@ -45,8 +45,6 @@ Public NotInheritable Class CSVSerializer(Of t As New)
             csvRow.Clear()
 
             For Each i In objList
-                If PostBackFunction IsNot Nothing Then PostBackFunction.Invoke("Writing data.", (objList.IndexOf(i) / objList.Count))
-
                 csvResult.Append(vbCrLf)
 
                 For Each Header In _CSVColumnHeaders
@@ -73,9 +71,6 @@ Public NotInheritable Class CSVSerializer(Of t As New)
 
             Return result
 
-        Catch ex As WaitWindow.DoItCanceledException
-            Return String.Empty
-        End Try
     End Function
 
     ''' <summary>
@@ -120,7 +115,7 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
     ''' <param name="OwnerForm">Any model windows shown as a result of calling this function will be owned by this form.</param>
     ''' <param name="SuppressMappingWindow">If <c>Treu</c>, accept default mapping between the CSV field names of <c>t</c> and the CSV data. columns with non-matching data are discarded. If <c>False</c>, a model form is presented to the the user which allows the user to specify the mapping.</param>
     ''' <returns>An <see cref="IEnumerable(Of t)"/> of the objects deserialized, or <c>Nothing</c> if the user selects the Cancel button on the file selection window or mapping window, or <c>Nothing</c> if no data could be deserialized.</returns>
-    Shared Function Deserialize(Optional OwnerForm As Windows.Forms.Form = Nothing, Optional SuppressMappingWindow As Boolean = False, Optional PostBackFunction As WaitWindow.PostBack = Nothing) As IEnumerable(Of t)
+    Shared Function Deserialize(Optional OwnerForm As Windows.Forms.Form = Nothing, Optional SuppressMappingWindow As Boolean = False) As IEnumerable(Of t)
 
         '==overall steps==
         '1: show file selection
@@ -132,8 +127,6 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
 
 
         'step 1: show file selection
-        If PostBackFunction IsNot Nothing Then PostBackFunction.Invoke("Waiting on user.", -1)
-
         Dim OpenWindow As New System.Windows.Forms.OpenFileDialog With {
                                         .Filter = "Comma Separated Values|*.csv|All Files|*.*",
                                         .DefaultExt = "csv",
@@ -142,7 +135,7 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
         'Kludge: this Deserialize(..) may or may not be called from the UI thread. The variable 'a' below contains code which must be called on the UI thread
         Dim a = Function()
                     If OpenWindow.ShowDialog(OwnerForm) = System.Windows.Forms.DialogResult.OK Then
-                        Return Deserialize(New IO.FileInfo(OpenWindow.FileName), OwnerForm, SuppressMappingWindow, PostBackFunction)
+                        Return Deserialize(New IO.FileInfo(OpenWindow.FileName), OwnerForm, SuppressMappingWindow)
                     Else
                         Return Nothing
                     End If
@@ -163,10 +156,10 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
     ''' <param name="OwnerForm">Any model windows shown as a result of calling this function will be owned by this form.</param>
     ''' <param name="SuppressMappingWindow">If <c>Treu</c>, accept default mapping between the CSV field names of <c>t</c> and the CSV data. columns with non-matching data are discarded. If <c>False</c>, a model form is presented to the the user which allows the user to specify the mapping.</param>
     ''' <returns>An <see cref="IEnumerable(Of t)"/> of the objects deserialized, or <c>Nothing</c> if the user selects the Cancel button on the mapping window, or <c>Nothing</c> if no data could be deserialized.</returns>
-    Shared Function Deserialize(CSVFile As IO.FileInfo, Optional OwnerForm As Windows.Forms.Form = Nothing, Optional SuppressMappingWindow As Boolean = False, Optional PostBackFunction As WaitWindow.PostBack = Nothing) As IEnumerable(Of t)
+    Shared Function Deserialize(CSVFile As IO.FileInfo, Optional OwnerForm As Windows.Forms.Form = Nothing, Optional SuppressMappingWindow As Boolean = False) As IEnumerable(Of t)
         'step 2: set up file stream
         Using s As IO.Stream = CSVFile.OpenRead()
-            Return Deserialize(s, OwnerForm, SuppressMappingWindow, PostBackFunction)
+            Return Deserialize(s, OwnerForm, SuppressMappingWindow)
         End Using
     End Function
     ''' <summary>
@@ -176,20 +169,16 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
     ''' <param name="OwnerForm">Any model windows shown as a result of calling this function will be owned by this form.</param>
     ''' <param name="SuppressMappingWindow">If <c>Treu</c>, accept default mapping between the CSV field names of <c>t</c> and the CSV data. columns with non-matching data are discarded. If <c>False</c>, a model form is presented to the the user which allows the user to specify the mapping.</param>
     ''' <returns>An <see cref="IEnumerable(Of t)"/> of the objects deserialized, or <c>Nothing</c> if the user selects the Cancel button on the mapping window, or <c>Nothing</c> if no data could be deserialized.</returns>
-    Shared Function Deserialize(CSVStream As IO.Stream, Optional OwnerForm As Windows.Forms.Form = Nothing, Optional SuppressMappingWindow As Boolean = False, Optional PostBackFunction As WaitWindow.PostBack = Nothing) As IEnumerable(Of t)
-        Try
-
-            'step 3: import all data
-            Dim table As List(Of List(Of String))
-            table = ParseCSV(CSVStream, PostBackFunction)
+    Shared Function Deserialize(CSVStream As IO.Stream, Optional OwnerForm As Windows.Forms.Form = Nothing, Optional SuppressMappingWindow As Boolean = False) As IEnumerable(Of t)
+        'step 3: import all data
+        Dim table As List(Of List(Of String))
+            table = ParseCSV(CSVStream)
 
             'normalize the data: Since there might be a different number of columns in each row, make them all the same
             Dim MaxColumns = Aggregate i As List(Of String) In table Into Max(i.Count)
             Dim NonConformingRows = (From NonConformingRow In table Where NonConformingRow.Count < MaxColumns).ToList
 
             For Each row In NonConformingRows
-                If PostBackFunction IsNot Nothing Then PostBackFunction.Invoke("Checking CSV data.", (NonConformingRows.IndexOf(row) / NonConformingRows.Count))
-
                 Dim i = row.Count
                 While i < MaxColumns
                     row.Add(String.Empty)
@@ -216,7 +205,6 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
             Dim mappingDialogResult As Windows.Forms.DialogResult
             If Not SuppressMappingWindow Then
                 'show the form
-                If PostBackFunction IsNot Nothing Then PostBackFunction.Invoke("Waiting on user.", -1)
                 mappingDialogResult = FieldMappingForm.ShowDialog(OwnerForm)
             Else
                 'don't show the form, short-circut the result
@@ -238,7 +226,6 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
                 '   Add the created T to a list
                 'Once we're done with all of the rows, return the list
                 For Each DataRow In MappedValues
-                    If PostBackFunction IsNot Nothing Then PostBackFunction.Invoke(If(SuppressMappingWindow, "Processing data", "Performing data mapping."), (MappedValues.IndexOf(DataRow) / MappedValues.Count))
                     If DataRow IsNot MappedValues(0) Then
                         Dim Record As New t
 
@@ -270,9 +257,7 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
                 Return Nothing
             End If
 
-        Catch ex As WaitWindow.DoItCanceledException
-            Return Nothing
-        End Try
+
     End Function
     Private Shared Function ConvertToNullable(Of type As Structure)() As type?
     End Function
@@ -319,7 +304,7 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
     ''' Spaces are not trimmed from records. All values are expceted to be separated by a comma (,) without a space.
     ''' Paired double quotes ("") are escaped to a single double quote (").
     ''' </remarks>
-    Private Shared Function ParseCSV(CSVStream As IO.Stream, Optional PostBackFunction As WaitWindow.PostBack = Nothing) As List(Of List(Of String))
+    Private Shared Function ParseCSV(CSVStream As IO.Stream) As List(Of List(Of String))
         Const DELIM = ","c
         Const QUOTE = """"c
 
@@ -337,7 +322,6 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
         Dim ROW As New List(Of String)
 
         Using sr As New IO.StreamReader(CSVStream)
-            If PostBackFunction IsNot Nothing Then PostBackFunction.Invoke("Reading CSV file.", -1)
             buffer = sr.ReadToEnd()
         End Using
 
@@ -364,7 +348,7 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
                             If buffer(i + 1) = QUOTE Then 'edge case: "" escaped to " in a quoted string
                                 CurrentRecord &= c
                                 i += 1 'skip the next iteration
-                            ElseIf (buffer(i + 1) <> DELIM) And (buffer(i + 1) <> vbCr(0)) And (buffer(i + 1) <> vblf(0)) Then 'edge case: text between closing quote and delimiter/EOL
+                            ElseIf (buffer(i + 1) <> DELIM) And (buffer(i + 1) <> vbCr(0)) And (buffer(i + 1) <> vbLf(0)) Then 'edge case: text between closing quote and delimiter/EOL
                                 Throw New MalformedCSVException(MalformedCSVException.MalformationTypes.TextAfterCloseQuote, CurrentRowNumber, CurrentColNumber)
                             Else
                                 inQuote = False
@@ -380,7 +364,6 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
                     If inQuote Then 'edge case: CR or LF in quoted record to be treated as literal
                         CurrentRecord &= c
                     Else
-                        If PostBackFunction IsNot Nothing Then PostBackFunction.Invoke("Parsing CSV file.", (i / (l - 1)))
                         If i + 2 < l Then 'CR or LF appearing alone or paired, not at the end of the file
                             'treat it as the end of the record...
                             ROW.Add(CurrentRecord)

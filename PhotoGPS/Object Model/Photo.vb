@@ -1,4 +1,22 @@
-﻿Public Class Photo
+﻿Imports PhotoGPS
+
+Public Class PhotoComparer
+    Implements IEqualityComparer(Of Photo)
+
+    Public Overloads Function Equals(x As Photo, y As Photo) As Boolean Implements IEqualityComparer(Of Photo).Equals
+        Dim tmp = (x.GPS = y.GPS) And (x.TakenDate = y.TakenDate) And (x.FileSize = y.FileSize) And (x.Filename = y.Filename)
+
+        Return tmp
+    End Function
+
+    Public Overloads Function GetHashCode(obj As Photo) As Integer Implements IEqualityComparer(Of Photo).GetHashCode
+        Return (obj.Lat & obj.Long & obj.TakenDate.ToShortDateString & obj.FileSize & obj.Filename).GetHashCode
+    End Function
+End Class
+
+Public Class Photo
+    'Implements IEquatable(Of Photo)
+
     Public Shared ReadOnly SupportedExtensions() As String = {".jpg", ".jpeg", ".jpe"} 'Best practices is to use a constant but you can't have a constant array...
 
     Public Property GPS As GMap.NET.PointLatLng
@@ -86,8 +104,9 @@
     ''' <param name="File">The <see cref="IO.FileInfo"/> from which to create the <see cref="Photo"/>.</param>
     ''' <returns>A <see cref="Photo"/> representing the file specified by <paramref name="File"/> or <c>Nothing</c> if the file metadate could not be read.</returns>
     ''' <remarks>This method currently uses the file's extension to differentiate file types. Supported extension are .JPG, .JPEG, and .JPE. While there are plans to include support for other formats, such as MP4, support is only available for JPEG photos at this time.</remarks>
-    Shared Function FromFile(File As IO.FileInfo) As Photo
+    Shared Function FromFile(File As IO.FileInfo, Project As Project) As Photo
         Dim res As New Photo
+        res.Project = Project
 
         Return res.RefreshMetadata(File)
     End Function
@@ -174,8 +193,6 @@
 
         End Get
     End Property
-
-
 
 
 

@@ -22,7 +22,7 @@ Partial Class FMain
 
                 Dim AllFiles = From i In folder.EnumerateFiles("*", If(MsgBoxRecursiveResponse = MsgBoxResult.Yes, IO.SearchOption.AllDirectories, IO.SearchOption.TopDirectoryOnly))
 
-                AddPhotoFilesAsync(AllFiles)
+                AddPhotoFiles(AllFiles)
 
             End If
         End If
@@ -40,18 +40,15 @@ Partial Class FMain
         fb.EnsurePathExists = True
 
         If fb.ShowDialog() = DialogResult.OK Then
-            AddPhotoFilesAsync(From i In fb.FileNames Select New IO.FileInfo(i))
+            AddPhotoFiles(From i In fb.FileNames Select New IO.FileInfo(i))
         End If
     End Sub
 
-    Private Async Sub AddPhotoFilesAsync(AllFiles As IEnumerable(Of IO.FileInfo))
-
+    Private Sub AddPhotoFiles(AllFiles As IEnumerable(Of IO.FileInfo))
         Dim a =
             Sub()
                 Dim FilteredFiles = (From f In AllFiles From x In Photo.SupportedExtensions Where f.Extension.ToLower = x.ToLower Select f).ToList
-
                 Dim AddedPhotos = New List(Of Photo)
-
                 Dim count = FilteredFiles.Count
                 Dim current = 0
 
@@ -60,29 +57,20 @@ Partial Class FMain
                 Threading.Tasks.Parallel.ForEach(Of IO.FileInfo)(FilteredFiles,
                 Sub(f, LoopState)
                     If CancelTask Then LoopState.Break()
-
                     If Not LoopState.ShouldExitCurrentIteration Then
                         current += 1
-
-
-
-                        Dim NewPhoto = Photo.FromFile(f)
-                        If NewPhoto IsNot Nothing Then
-                            NewPhoto.Project = Project
-                            AddedPhotos.Add(NewPhoto)
-                        End If
+                        SetProgressStatus(String.Format("Adding photos. {0} remaining.", count - current), current / count)
+                        Dim NewPhoto = Photo.FromFile(f, Project)
+                        AddedPhotos.Add(NewPhoto)
                     End If
                 End Sub)
 
                 InitShowProgress(False, PhotoControls)
-
-                Project.Photos = Project.Photos.Union(AddedPhotos)
+                Project.Photos = (From i In Project.Photos.Concat(AddedPhotos) Where i IsNot Nothing Order By i.TakenDate).Distinct(New PhotoComparer)
+                Me.LVPhotos.Invoke(Sub() RefreshPhotosLV(True))
             End Sub
 
-        Await System.Threading.Tasks.Task.Run(a)
-
-        RefreshPhotosLV(True)
-
+        a.BeginInvoke(Nothing, Nothing)
     End Sub
 
 

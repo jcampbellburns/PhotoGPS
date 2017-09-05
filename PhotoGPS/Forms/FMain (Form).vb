@@ -26,6 +26,14 @@
 
         Me.RefreshLocationsLV(False)
 
+
+        PhotoControls = {LVPhotos, TSPhotos}
+        LocationControls = {LVLocations, TSLocations}
+        MapControls = {MAP, TSMap, TSAddress, TSCoords}
+        ProjectControls = {TSProject}
+        AppControls = (DirectCast({TSMain}, Control()).Union(PhotoControls).Union(LocationControls).Union(MapControls).Union(ProjectControls)).ToArray
+        ShowProgressControls = {SSPTaskProgress, SSBStop}
+
     End Sub
 
     Public Project As New Project
@@ -257,15 +265,26 @@
     Private Sub LVPhotos_RetrieveVirtualItem(sender As Object, e As RetrieveVirtualItemEventArgs) Handles LVPhotos.RetrieveVirtualItem
         e.Item = Me._PhotoLVItems(e.ItemIndex)
     End Sub
+
+    Private Sub LVPhotos_KeyDown(sender As Object, e As KeyEventArgs) Handles LVPhotos.KeyDown
+        If e.Control Then
+            If e.KeyCode = Keys.A Then
+                '<Ctrl> + A: Select All
+                Me._PhotoLVItems.ToList.ForEach(Sub(i) i.Selected = True)
+
+                LVPhotos.Refresh()
+            End If
+        End If
+    End Sub
 #End Region
 
 #Region "Progress bar system"
-    Private PhotoControls() As Control = {LVPhotos, TSPhotos}
-    Private LocationControls() As Control = {LVLocations, TSLocations}
-    Private MapControls() As Control = {MAP, TSMap, TSAddress, TSCoords}
-    Private ProjectControls() As Control = {TSProject}
-    Private AppControls() As Control = {TSMain}.Union(PhotoControls).Union(LocationControls).Union(MapControls).Union(ProjectControls)
-    Private ShowProgressControls() As ToolStripItem = {SSPTaskProgress, SSBStop}
+    Private PhotoControls() As Control
+    Private LocationControls() As Control
+    Private MapControls() As Control
+    Private ProjectControls() As Control
+    Private AppControls() As Control
+    Private ShowProgressControls() As ToolStripItem
 
     Private CancelTask As Boolean
 
@@ -275,22 +294,56 @@
     ''' <param name="ProgressControlState"><c>True</c>: Show the progress bar and cancel button. Disable all of the controls in <paramref name="ControlSet"/>. <c>False</c>: Hide the progress bar and cancel button. Enable all of the controls in <paramref name="ControlSet"/></param>
     ''' <param name="ControlSet">An array of <see cref="Windows.Forms.Control"/> to enable or disable.</param>
     Private Sub InitShowProgress(ProgressControlState As Boolean, ControlSet As Control())
-        For Each i In ControlSet
-            i.Enabled = Not ProgressControlState
-        Next
+        CancelTask = False
 
-        For Each i In ShowProgressControls
-            i.Visible = ProgressControlState
-        Next
+        Dim a = Sub()
+                    For Each i In ControlSet
+                        i.Enabled = Not ProgressControlState
+                    Next
+
+                    For Each i In ShowProgressControls
+                        i.Visible = ProgressControlState
+                    Next
+
+                    If ProgressControlState = False Then
+                        SSLStatus.Text = "Ready"
+                    End If
+                End Sub
+
+        If Me.InvokeRequired Then
+            Me.Invoke(a)
+        Else
+            a()
+        End If
     End Sub
 
-    Private Sub SetProgressStatus(Message As String, Percentage As Single)
+    Private Sub SetProgressStatus(Message As String, Percentage As Double)
+        Static n As Date
 
+        Dim a = Sub()
+
+                    If Date.Now > n Then
+                        n = Date.Now.AddSeconds(0.1)
+                        SSLStatus.Text = Message
+                        SSPTaskProgress.Value = Percentage * 100
+                    End If
+
+                End Sub
+
+        If Me.InvokeRequired Then
+            Me.Invoke(a)
+        Else
+            a()
+        End If
     End Sub
 
     Private Sub SSBStop_Click(sender As Object, e As EventArgs) Handles SSBStop.Click
         CancelTask = True
     End Sub
+
+
+
+
 
 
 #End Region

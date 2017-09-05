@@ -56,7 +56,6 @@ Partial Class FMain
         Dim ToolStripButton1 As System.Windows.Forms.ToolStripButton
         Dim ToolStripButton2 As System.Windows.Forms.ToolStripButton
         Dim STATUSMain As System.Windows.Forms.StatusStrip
-        Dim SSLStatus As System.Windows.Forms.ToolStripStatusLabel
         Me.MAP = New GMap.NET.WindowsForms.GMapControl()
         Me.TSAddress = New System.Windows.Forms.ToolStrip()
         Me.TSCoords = New System.Windows.Forms.ToolStrip()
@@ -95,9 +94,10 @@ Partial Class FMain
         Me.ToolStripButton11 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton14 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
-        Me.TSMain = New System.Windows.Forms.ToolStrip()
+        Me.SSLStatus = New System.Windows.Forms.ToolStripStatusLabel()
         Me.SSPTaskProgress = New System.Windows.Forms.ToolStripProgressBar()
         Me.SSBStop = New System.Windows.Forms.ToolStripButton()
+        Me.TSMain = New System.Windows.Forms.ToolStrip()
         Me.ILFolder = New System.Windows.Forms.ImageList(Me.components)
         MENUMain = New System.Windows.Forms.MenuStrip()
         FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -131,7 +131,6 @@ Partial Class FMain
         ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
         STATUSMain = New System.Windows.Forms.StatusStrip()
-        SSLStatus = New System.Windows.Forms.ToolStripStatusLabel()
         MENUMain.SuspendLayout()
         PANELMap.SuspendLayout()
         Me.TSAddress.SuspendLayout()
@@ -143,8 +142,8 @@ Partial Class FMain
         Me.PANELPhotos.SuspendLayout()
         Me.TSPhotos.SuspendLayout()
         Me.TSProject.SuspendLayout()
-        Me.TSMain.SuspendLayout()
         STATUSMain.SuspendLayout()
+        Me.TSMain.SuspendLayout()
         Me.SuspendLayout()
         '
         'MENUMain
@@ -734,15 +733,6 @@ Partial Class FMain
         CAPTIONProject.TextAlign = System.Drawing.ContentAlignment.TopCenter
         CAPTIONProject.TrackFocus = PANELProject
         '
-        'TSMain
-        '
-        Me.TSMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        Me.TSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripButton1, ToolStripButton2})
-        Me.TSMain.Location = New System.Drawing.Point(0, 24)
-        Me.TSMain.Name = "TSMain"
-        Me.TSMain.Size = New System.Drawing.Size(1402, 25)
-        Me.TSMain.TabIndex = 0
-        '
         'ToolStripButton1
         '
         ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
@@ -763,7 +753,7 @@ Partial Class FMain
         '
         'STATUSMain
         '
-        STATUSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {SSLStatus, Me.SSPTaskProgress, Me.SSBStop})
+        STATUSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SSLStatus, Me.SSPTaskProgress, Me.SSBStop})
         STATUSMain.Location = New System.Drawing.Point(0, 565)
         STATUSMain.Name = "STATUSMain"
         STATUSMain.Size = New System.Drawing.Size(1402, 22)
@@ -772,9 +762,9 @@ Partial Class FMain
         '
         'SSLStatus
         '
-        SSLStatus.Name = "SSLStatus"
-        SSLStatus.Size = New System.Drawing.Size(39, 17)
-        SSLStatus.Text = "Ready"
+        Me.SSLStatus.Name = "SSLStatus"
+        Me.SSLStatus.Size = New System.Drawing.Size(39, 17)
+        Me.SSLStatus.Text = "Ready"
         '
         'SSPTaskProgress
         '
@@ -791,6 +781,15 @@ Partial Class FMain
         Me.SSBStop.Size = New System.Drawing.Size(23, 20)
         Me.SSBStop.Text = "ToolStripDropDownButton1"
         Me.SSBStop.Visible = False
+        '
+        'TSMain
+        '
+        Me.TSMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.TSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripButton1, ToolStripButton2})
+        Me.TSMain.Location = New System.Drawing.Point(0, 24)
+        Me.TSMain.Name = "TSMain"
+        Me.TSMain.Size = New System.Drawing.Size(1402, 25)
+        Me.TSMain.TabIndex = 0
         '
         'ILFolder
         '
@@ -836,10 +835,10 @@ Partial Class FMain
         Me.TSPhotos.PerformLayout()
         Me.TSProject.ResumeLayout(False)
         Me.TSProject.PerformLayout()
-        Me.TSMain.ResumeLayout(False)
-        Me.TSMain.PerformLayout()
         STATUSMain.ResumeLayout(False)
         STATUSMain.PerformLayout()
+        Me.TSMain.ResumeLayout(False)
+        Me.TSMain.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -891,4 +890,5 @@ Partial Class FMain
     Friend WithEvents TSMap As ToolStrip
     Friend WithEvents TSProject As ToolStrip
     Friend WithEvents TSMain As ToolStrip
+    Friend WithEvents SSLStatus As ToolStripStatusLabel
 End Class

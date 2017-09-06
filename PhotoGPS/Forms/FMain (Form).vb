@@ -265,17 +265,6 @@
     Private Sub LVPhotos_RetrieveVirtualItem(sender As Object, e As RetrieveVirtualItemEventArgs) Handles LVPhotos.RetrieveVirtualItem
         e.Item = Me._PhotoLVItems(e.ItemIndex)
     End Sub
-
-    Private Sub LVPhotos_KeyDown(sender As Object, e As KeyEventArgs) Handles LVPhotos.KeyDown
-        If e.Control Then
-            If e.KeyCode = Keys.A Then
-                '<Ctrl> + A: Select All
-                Me._PhotoLVItems.ToList.ForEach(Sub(i) i.Selected = True)
-
-                LVPhotos.Refresh()
-            End If
-        End If
-    End Sub
 #End Region
 
 #Region "Progress bar system"

@@ -133,15 +133,43 @@ Partial Class FMain
     End Sub
 
     Private Sub RunCorrelation()
-        Threading.Tasks.Parallel.ForEach(Of Location)(From i In Project.Locations Where _LocationLVItems.Contains(i.ListViewItem),
-                                                      Sub(i)
-                                                          Dim a = i.PhotoCount
-                                                          i.UpdateListViewItem()
-                                                      End Sub)
+        Dim a =
+        Sub()
 
-        LVLocations.Refresh()
-        LVPhotos.Refresh()
-    End Sub
+            InitShowProgress(True, LocationControls)
+            InitShowProgress(True, PhotoControls)
+
+            Dim locations = (From i In Project.Locations Where _LocationLVItems.Contains(i.ListViewItem)).ToList
+            Dim current = 0
+            Dim count = locations.Count
+
+            Dim b = Threading.Tasks.Parallel.ForEach(Of Location)(locations,
+                    Sub(loc, LoopState)
+                        If CancelTask Then LoopState.Break()
+                        If Not LoopState.ShouldExitCurrentIteration Then
+                            current += 1
+
+                            SetProgressStatus(String.Format("Correlating photos to locations. {0} locations remaining.", count - current), current / count)
+
+                            Dim c = loc.Photos
+
+                            LVLocations.Invoke(Sub() loc.UpdateListViewItem())
+                        End If
+
+                    End Sub)
+
+            InitShowProgress(False, LocationControls)
+            InitShowProgress(False, PhotoControls)
+
+        End Sub
+
+        a.BeginInvoke(Nothing, Nothing)
+
+            'a()
+
+            'LVLocations.Refresh()
+            'LVPhotos.Refresh()
+        End Sub
 
     Private Sub RenameAllPhotos()
         If _PhotoLVItems.Count > 0 Then

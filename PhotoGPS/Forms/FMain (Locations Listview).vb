@@ -17,11 +17,16 @@ Partial Class FMain
         'load locations from csv
 
         Project.Locations = CSVSerializer.CSVDeserializer(Of Location).Deserialize(Me, False)
-        Project.Locations.AsParallel.ForAll(Sub(i) i.Project = Project)
 
-                _LocationLVItems = (From i In Project.Locations Select i.ListViewItem).ToArray
+        If Project.Locations IsNot Nothing Then
+            For Each l In Project.Locations
+                l.Project = Project
+            Next
 
-                LVLocations.Invoke(Sub() RefreshLocationsLV(True))
+            _LocationLVItems = (From i In Project.Locations Select i.ListViewItem).ToArray
+
+            LVLocations.Invoke(Sub() RefreshLocationsLV(True))
+        End If
 
     End Sub
 
@@ -57,7 +62,7 @@ Partial Class FMain
         _LocationLVItems = _SpecialLocationItems.Union(From i In Project.Locations Select i.ListViewItem).ToArray
 
         Me.LVLocations.VirtualListSize = _LocationLVItems.Count
-        Me.LVLocations.Refresh()
+
     End Sub
 
     'Private Sub AddLocations(Locations As List(Of Location), pb As WaitWindow.PostBack)

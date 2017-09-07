@@ -104,39 +104,51 @@ Partial Class FMain
     End Sub
 
     Private Sub RefreshPhotosLV(AlsoRunCorrelation As Boolean)
-        Dim specialItemSelectionCount = (From i In Me._SpecialLocationItems Where i.Selected).Count
 
-        Dim selectedLocationItems = (From i In _LocationLVItems Where i.Selected).Except(_SpecialLocationItems)
 
-        If specialItemSelectionCount = 1 Then
-            Select Case True
-                Case Me._AllFilesItem.Selected
+        If Project IsNot Nothing Then
+            If (Project.Photos.Count > 0) Then
+                Dim specialItemSelectionCount = (From i In Me._SpecialLocationItems Where i.Selected).Count
+                Dim selectedLocationItems = (From i In _LocationLVItems Where i.Selected).Except(_SpecialLocationItems)
+
+                If (specialItemSelectionCount = 1) And (selectedLocationItems.Count = 0) Then
+                    'if a single special item and no location items are selected...
+                    Select Case True
+                        Case Me._AllFilesItem.Selected
+                            'all photos
+                            _PhotoLVItems = (From p In Project.Photos Select p.ListviewItem).ToArray
+                        Case Me._PhotosWithMultipleLocations.Selected
+                            'only photos with multiple locations
+                            _PhotoLVItems = (From p In Project.Photos Where p.LocationCount > 1 Select p.ListviewItem).ToArray
+                        Case Me._UnassociatedFilesItem.Selected
+                            'photos with no locations
+                            _PhotoLVItems = (From p In Project.Photos Where p.LocationCount = 0 Select p.ListviewItem).ToArray
+                    End Select
+                ElseIf (specialItemSelectionCount = 0) And (selectedLocationItems.Count = 0) Then
+                    'if no locations are selected at all, display all photos
                     _PhotoLVItems = (From p In Project.Photos Select p.ListviewItem).ToArray
-                Case Me._PhotosWithMultipleLocations.Selected
-                    _PhotoLVItems = (From p In Project.Photos Where p.LocationCount > 1 Select p.ListviewItem).ToArray
-                Case Me._UnassociatedFilesItem.Selected
-                    _PhotoLVItems = (From p In Project.Photos Where p.LocationCount = 0 Select p.ListviewItem).ToArray
-            End Select
-        ElseIf (specialItemSelectionCount > 1) Or (selectedLocationItems.Count > 0) And (specialItemSelectionCount > 0) Then
-            'if more than one special location item is selected or selection contains both special location items and normal locations
-            _PhotoLVItems = {}
-        ElseIf selectedLocationItems.Count = 0 Then
-            'no locations are selected
-            Me._AllFilesItem.Selected = True
-        Else
-            _PhotoLVItems = (From p In Project.Photos From l In Project.Locations Where l.Photos.Contains(p) And l.ListViewItem.Selected Select p.ListviewItem).Distinct.ToArray
+                ElseIf (specialItemSelectionCount = 0) And (selectedLocationItems.Count > 0) Then
+                    'if one or more location items and no special items are selected, display photos associated with selected locations
+                    _PhotoLVItems = (From p In Project.Photos From l In Project.Locations Where l.Photos.Contains(p) And l.ListViewItem.Selected Select p.ListviewItem).Distinct.ToArray
+                Else
+                    'if more than one special location item is selected or selection contains both special location items and normal locations, display no photo items
+                    _PhotoLVItems = {}
+                End If
+
+                Me.LVPhotos.VirtualListSize = _PhotoLVItems.Count
+
+                If AlsoRunCorrelation Then RunCorrelation()
+
+            End If
+
         End If
-
-        Me.LVPhotos.VirtualListSize = _PhotoLVItems.Count
-
-        If AlsoRunCorrelation Then RunCorrelation()
     End Sub
 
     Private Sub RunCorrelation()
         Dim a =
         Sub()
-
             InitShowProgress(True, LocationControls)
+
             InitShowProgress(True, PhotoControls)
 
             Dim locations = (From i In Project.Locations Where _LocationLVItems.Contains(i.ListViewItem)).ToList
@@ -144,32 +156,37 @@ Partial Class FMain
             Dim count = locations.Count
 
             Dim b = Threading.Tasks.Parallel.ForEach(Of Location)(locations,
-                    Sub(loc, LoopState)
-                        If CancelTask Then LoopState.Break()
-                        If Not LoopState.ShouldExitCurrentIteration Then
-                            current += 1
+                Sub(loc, LoopState)
 
-                            SetProgressStatus(String.Format("Correlating photos to locations. {0} locations remaining.", count - current), current / count)
+                    If CancelTask Then LoopState.Break()
+                    If Not LoopState.ShouldExitCurrentIteration Then
+                        current += 1
 
-                            Dim c = loc.Photos
+                        SetProgressStatus(String.Format("Correlating photos to locations. {0} locations remaining.", count - current), current / count)
 
-                            LVLocations.Invoke(Sub() loc.UpdateListViewItem())
-                        End If
+                        loc.Photos = loc.PhotosFromLocation.ToList
 
-                    End Sub)
+                        LVLocations.Invoke(Sub() loc.UpdateListViewItem())
+                    End If
+                End Sub)
 
+            LVLocations.Invoke(
+                Sub()
+                    Me._AllFilesItem.SubItems(7).Text = Project.Photos.Count
+                    Me._PhotosWithMultipleLocations.SubItems(7).Text = (From p In Project.Photos Where p.Locations.Count > 1).Count
+                    Me._UnassociatedFilesItem.SubItems(7).Text = (From p In Project.Photos Where p.Locations.Count = 0).Count
+                End Sub)
             InitShowProgress(False, LocationControls)
             InitShowProgress(False, PhotoControls)
+
+
 
         End Sub
 
         a.BeginInvoke(Nothing, Nothing)
 
-            'a()
 
-            'LVLocations.Refresh()
-            'LVPhotos.Refresh()
-        End Sub
+    End Sub
 
     Private Sub RenameAllPhotos()
         If _PhotoLVItems.Count > 0 Then

@@ -215,8 +215,10 @@
     End Sub
 
     Private Sub LVLocations_RetrieveVirtualItem(sender As Object, e As RetrieveVirtualItemEventArgs) Handles LVLocations.RetrieveVirtualItem
+
         e.Item = Me._LocationLVItems(e.ItemIndex)
     End Sub
+
 #End Region
 
 #Region "Photos Toolstrip"
@@ -329,6 +331,8 @@
     Private Sub SSBStop_Click(sender As Object, e As EventArgs) Handles SSBStop.Click
         CancelTask = True
     End Sub
+
+
 
 
 

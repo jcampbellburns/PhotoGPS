@@ -54,8 +54,8 @@ Partial Class FMain
         Dim CAPTIONPhotos As PhotoGPS.CaptionBarControl
         Dim CAPTIONProject As PhotoGPS.CaptionBarControl
         Dim ToolStripButton1 As System.Windows.Forms.ToolStripButton
-        Dim ToolStripButton2 As System.Windows.Forms.ToolStripButton
         Dim STATUSMain As System.Windows.Forms.StatusStrip
+        Dim TSBStopOnLocationRefresh As System.Windows.Forms.ToolStripButton
         Me.MAP = New GMap.NET.WindowsForms.GMapControl()
         Me.TSAddress = New System.Windows.Forms.ToolStrip()
         Me.TSCoords = New System.Windows.Forms.ToolStrip()
@@ -129,8 +129,8 @@ Partial Class FMain
         CAPTIONPhotos = New PhotoGPS.CaptionBarControl()
         CAPTIONProject = New PhotoGPS.CaptionBarControl()
         ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
-        ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
         STATUSMain = New System.Windows.Forms.StatusStrip()
+        TSBStopOnLocationRefresh = New System.Windows.Forms.ToolStripButton()
         MENUMain.SuspendLayout()
         PANELMap.SuspendLayout()
         Me.TSAddress.SuspendLayout()
@@ -742,15 +742,6 @@ Partial Class FMain
         ToolStripButton1.Size = New System.Drawing.Size(23, 22)
         ToolStripButton1.Text = "ToolStripButton1"
         '
-        'ToolStripButton2
-        '
-        ToolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), System.Drawing.Image)
-        ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
-        ToolStripButton2.Name = "ToolStripButton2"
-        ToolStripButton2.Size = New System.Drawing.Size(23, 22)
-        ToolStripButton2.Text = "ToolStripButton2"
-        '
         'STATUSMain
         '
         STATUSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SSLStatus, Me.SSPTaskProgress, Me.SSBStop})
@@ -782,10 +773,19 @@ Partial Class FMain
         Me.SSBStop.Text = "ToolStripDropDownButton1"
         Me.SSBStop.Visible = False
         '
+        'TSBStopOnLocationRefresh
+        '
+        TSBStopOnLocationRefresh.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        TSBStopOnLocationRefresh.Image = CType(resources.GetObject("TSBStopOnLocationRefresh.Image"), System.Drawing.Image)
+        TSBStopOnLocationRefresh.ImageTransparentColor = System.Drawing.Color.Magenta
+        TSBStopOnLocationRefresh.Name = "TSBStopOnLocationRefresh"
+        TSBStopOnLocationRefresh.Size = New System.Drawing.Size(23, 22)
+        TSBStopOnLocationRefresh.Text = "ToolStripButton2"
+        '
         'TSMain
         '
         Me.TSMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        Me.TSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripButton1, ToolStripButton2})
+        Me.TSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripButton1, TSBStopOnLocationRefresh})
         Me.TSMain.Location = New System.Drawing.Point(0, 24)
         Me.TSMain.Name = "TSMain"
         Me.TSMain.Size = New System.Drawing.Size(1402, 25)

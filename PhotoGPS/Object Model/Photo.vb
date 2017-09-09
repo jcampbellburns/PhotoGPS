@@ -34,7 +34,7 @@ Public Class Photo
     ''' </summary>
     ''' <param name="File">The <see cref="IO.FileInfo"/> from which to populate the <see cref="Photo"/> fields.</param>
     ''' <returns>On success, returns a reference to this instance. On failure, returns <c>Nothing</c>.</returns>
-    ''' <remarks>This method is called by the static <see cref="photo.FromFile(IO.FileInfo)"/> method when creating a new <see cref="Photo"/> instance. It is also called when renaming or moving the file to update an existing instance.</remarks>
+    ''' <remarks>This method is called by the static <see cref="photo.FromFile"/> method when creating a new <see cref="Photo"/> instance. It is also called when renaming or moving the file to update an existing instance.</remarks>
     Private Function RefreshMetadata(File As IO.FileInfo) As Photo
         Select Case File.Extension.ToUpper
             Case ".JPG", ".JPEG", ".JPE"

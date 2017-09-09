@@ -100,13 +100,13 @@
         lvi.SubItems.Clear()
         lvi.Text = Me.LocationName
 
-        lvi.SubItems.AddRange({If(Me.Start.HasValue, Me.Start.Value.ToShortDateString, String.Empty),
-                              If(Me.End.HasValue, Me.End.Value.ToShortDateString, String.Empty),
-                              Me.Address,
-                              If(Me.Lat.HasValue, Me.Lat.Value.ToString("0.000000"), String.Empty),
-                              If(Me.Long.HasValue, Me.Long.Value.ToString("0.000000"), String.Empty),
-                              Me.ID,
-                              Me.PhotoCount.ToString})
+        lvi.SubItems.AddRange({New ListViewItem.ListViewSubItem(lvi, If(Me.Start.HasValue, Me.Start.Value.ToShortDateString, String.Empty)),
+                              New ListViewItem.ListViewSubItem(lvi, If(Me.End.HasValue, Me.End.Value.ToShortDateString, String.Empty)),
+                              New ListViewItem.ListViewSubItem(lvi, Me.Address),
+                              New ListViewItem.ListViewSubItem(lvi, If(Me.Lat.HasValue, Me.Lat.Value.ToString("0.000000"), String.Empty)),
+                              New ListViewItem.ListViewSubItem(lvi, If(Me.Long.HasValue, Me.Long.Value.ToString("0.000000"), String.Empty)),
+                              New ListViewItem.ListViewSubItem(lvi, Me.ID),
+                              New ListViewItem.ListViewSubItem(lvi, Me.PhotoCount.ToString)})
     End Sub
 
 End Class

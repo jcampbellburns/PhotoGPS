@@ -76,11 +76,6 @@ Partial Class FMain
         Me.PANELPhotos = New System.Windows.Forms.Panel()
         Me.LVPhotos = New System.Windows.Forms.ListView()
         Me.TSPhotos = New System.Windows.Forms.ToolStrip()
-        Me.TSBRemovePhotos = New System.Windows.Forms.ToolStripSplitButton()
-        Me.TSBRemoveSelectedPhotos = New System.Windows.Forms.ToolStripMenuItem()
-        Me.TSBRemovePhotosNoLongerAvailable = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
-        Me.TSBRemoveAllPhotos = New System.Windows.Forms.ToolStripMenuItem()
         Me.TBSAddPhotos = New System.Windows.Forms.ToolStripSplitButton()
         Me.TSBAddPhotosFolder = New System.Windows.Forms.ToolStripMenuItem()
         Me.TSBAddPhotosFile = New System.Windows.Forms.ToolStripMenuItem()
@@ -99,6 +94,7 @@ Partial Class FMain
         Me.SSBStop = New System.Windows.Forms.ToolStripButton()
         Me.TSMain = New System.Windows.Forms.ToolStrip()
         Me.ILFolder = New System.Windows.Forms.ImageList(Me.components)
+        Me.TSBRemovePhotos = New System.Windows.Forms.ToolStripButton()
         MENUMain = New System.Windows.Forms.MenuStrip()
         FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         TestToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -569,41 +565,6 @@ Partial Class FMain
         Me.TSPhotos.Size = New System.Drawing.Size(315, 25)
         Me.TSPhotos.TabIndex = 3
         '
-        'TSBRemovePhotos
-        '
-        Me.TSBRemovePhotos.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-        Me.TSBRemovePhotos.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.TSBRemovePhotos.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TSBRemoveSelectedPhotos, Me.TSBRemovePhotosNoLongerAvailable, Me.ToolStripSeparator3, Me.TSBRemoveAllPhotos})
-        Me.TSBRemovePhotos.Image = CType(resources.GetObject("TSBRemovePhotos.Image"), System.Drawing.Image)
-        Me.TSBRemovePhotos.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.TSBRemovePhotos.Name = "TSBRemovePhotos"
-        Me.TSBRemovePhotos.Size = New System.Drawing.Size(32, 22)
-        Me.TSBRemovePhotos.Text = "ToolStripButton5"
-        '
-        'TSBRemoveSelectedPhotos
-        '
-        Me.TSBRemoveSelectedPhotos.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.TSBRemoveSelectedPhotos.Name = "TSBRemoveSelectedPhotos"
-        Me.TSBRemoveSelectedPhotos.Size = New System.Drawing.Size(260, 22)
-        Me.TSBRemoveSelectedPhotos.Text = "Remove selected photos"
-        '
-        'TSBRemovePhotosNoLongerAvailable
-        '
-        Me.TSBRemovePhotosNoLongerAvailable.Name = "TSBRemovePhotosNoLongerAvailable"
-        Me.TSBRemovePhotosNoLongerAvailable.Size = New System.Drawing.Size(260, 22)
-        Me.TSBRemovePhotosNoLongerAvailable.Text = "Remove photos no longer available"
-        '
-        'ToolStripSeparator3
-        '
-        Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-        Me.ToolStripSeparator3.Size = New System.Drawing.Size(257, 6)
-        '
-        'TSBRemoveAllPhotos
-        '
-        Me.TSBRemoveAllPhotos.Name = "TSBRemoveAllPhotos"
-        Me.TSBRemoveAllPhotos.Size = New System.Drawing.Size(260, 22)
-        Me.TSBRemoveAllPhotos.Text = "Remove all photos..."
-        '
         'TBSAddPhotos
         '
         Me.TBSAddPhotos.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
@@ -798,6 +759,16 @@ Partial Class FMain
         Me.ILFolder.Images.SetKeyName(0, "VSO_Folder_16x.png")
         Me.ILFolder.Images.SetKeyName(1, "VSO_Document_16x.png")
         '
+        'TSBRemovePhotos
+        '
+        Me.TSBRemovePhotos.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.TSBRemovePhotos.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TSBRemovePhotos.Image = CType(resources.GetObject("TSBRemovePhotos.Image"), System.Drawing.Image)
+        Me.TSBRemovePhotos.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TSBRemovePhotos.Name = "TSBRemovePhotos"
+        Me.TSBRemovePhotos.Size = New System.Drawing.Size(23, 22)
+        Me.TSBRemovePhotos.Text = "ToolStripButton5"
+        '
         'FMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -865,10 +836,6 @@ Partial Class FMain
     Friend WithEvents ColumnHeader13 As ColumnHeader
     Friend WithEvents TSBAddPhotosFolder As ToolStripMenuItem
     Friend WithEvents TSBAddPhotosFile As ToolStripMenuItem
-    Friend WithEvents TSBRemoveSelectedPhotos As ToolStripMenuItem
-    Friend WithEvents TSBRemovePhotosNoLongerAvailable As ToolStripMenuItem
-    Friend WithEvents ToolStripSeparator3 As ToolStripSeparator
-    Friend WithEvents TSBRemoveAllPhotos As ToolStripMenuItem
     Friend WithEvents ToolStripButton11 As ToolStripButton
     Friend WithEvents ToolStripButton14 As ToolStripButton
     Friend WithEvents ToolStripSeparator4 As ToolStripSeparator
@@ -877,7 +844,6 @@ Partial Class FMain
     Friend WithEvents TSBRemoveLocations As ToolStripButton
     Friend WithEvents TSBAddLocation As ToolStripButton
     Friend WithEvents TBSAddPhotos As ToolStripSplitButton
-    Friend WithEvents TSBRemovePhotos As ToolStripSplitButton
     Friend WithEvents TSBSortPhotos As ToolStripSplitButton
     Friend WithEvents TSBSortPhotosByLocationName As ToolStripMenuItem
     Friend WithEvents TSBSortPhotosByTakenDate As ToolStripMenuItem
@@ -891,4 +857,5 @@ Partial Class FMain
     Friend WithEvents TSProject As ToolStrip
     Friend WithEvents TSMain As ToolStrip
     Friend WithEvents SSLStatus As ToolStripStatusLabel
+    Friend WithEvents TSBRemovePhotos As ToolStripButton
 End Class

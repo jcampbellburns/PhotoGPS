@@ -16,17 +16,32 @@ Partial Class FMain
     Private Sub ImportLocations()
         'load locations from csv
 
-        Project.Locations = CSVSerializer.CSVDeserializer(Of Location).Deserialize(Me, False)
+        Dim pb As CSVDeserializer(Of Location).PostBack =
+            Function(Message As String, Progress As Double, Force As Boolean) As Boolean
+                SetProgressStatus(Message, Progress, Force)
+                Return CancelTask
+            End Function
 
-        If Project.Locations IsNot Nothing Then
-            For Each l In Project.Locations
-                l.Project = Project
-            Next
+        Me.InitShowProgress(True, Me.LocationControls)
 
-            _LocationLVItems = (From i In Project.Locations Select i.ListViewItem).ToArray
+        Dim a = Sub()
+                    Project.Locations = CSVSerializer.CSVDeserializer(Of Location).Deserialize(pb, Me)
 
-            LVLocations.Invoke(Sub() RefreshLocationsLV(True))
-        End If
+                    Me.InitShowProgress(False, Me.LocationControls)
+
+                    If Project.Locations IsNot Nothing Then
+                        For Each l In Project.Locations
+                            l.Project = Project
+                        Next
+
+                        _LocationLVItems = (From i In Project.Locations Select i.ListViewItem).ToArray
+
+                        LVLocations.Invoke(Sub() RefreshLocationsLV(True))
+                    End If
+
+                End Sub
+
+        a.BeginInvoke(Nothing, Nothing)
 
     End Sub
 
@@ -62,6 +77,8 @@ Partial Class FMain
         _LocationLVItems = _SpecialLocationItems.Union(From i In Project.Locations Select i.ListViewItem).ToArray
 
         Me.LVLocations.VirtualListSize = _LocationLVItems.Count
+
+        If AlsoRunCorrelation Then RunCorrelation()
 
     End Sub
 

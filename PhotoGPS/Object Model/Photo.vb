@@ -1,5 +1,23 @@
-﻿Public Class Photo
-    Public Shared ReadOnly SupportedExtensions() As String = {"*.jpg", "*.jpeg", "*.jpe"} 'Best practices is to use a constant but you can't have a constant array...
+﻿Imports PhotoGPS
+
+Public Class PhotoComparer
+    Implements IEqualityComparer(Of Photo)
+
+    Public Overloads Function Equals(x As Photo, y As Photo) As Boolean Implements IEqualityComparer(Of Photo).Equals
+        Dim tmp = (x.GPS = y.GPS) And (x.TakenDate = y.TakenDate) And (x.FileSize = y.FileSize) And (x.Filename = y.Filename)
+
+        Return tmp
+    End Function
+
+    Public Overloads Function GetHashCode(obj As Photo) As Integer Implements IEqualityComparer(Of Photo).GetHashCode
+        Return (obj.Lat & obj.Long & obj.TakenDate.ToShortDateString & obj.FileSize & obj.Filename).GetHashCode
+    End Function
+End Class
+
+Public Class Photo
+    'Implements IEquatable(Of Photo)
+
+    Public Shared ReadOnly SupportedExtensions() As String = {".jpg", ".jpeg", ".jpe"} 'Best practices is to use a constant but you can't have a constant array...
 
     Public Property GPS As GMap.NET.PointLatLng
         Get
@@ -16,7 +34,7 @@
     ''' </summary>
     ''' <param name="File">The <see cref="IO.FileInfo"/> from which to populate the <see cref="Photo"/> fields.</param>
     ''' <returns>On success, returns a reference to this instance. On failure, returns <c>Nothing</c>.</returns>
-    ''' <remarks>This method is called by the static <see cref="photo.FromFile(IO.FileInfo)"/> method when creating a new <see cref="Photo"/> instance. It is also called when renaming or moving the file to update an existing instance.</remarks>
+    ''' <remarks>This method is called by the static <see cref="photo.FromFile"/> method when creating a new <see cref="Photo"/> instance. It is also called when renaming or moving the file to update an existing instance.</remarks>
     Private Function RefreshMetadata(File As IO.FileInfo) As Photo
         Select Case File.Extension.ToUpper
             Case ".JPG", ".JPEG", ".JPE"
@@ -84,20 +102,39 @@
     ''' Generate a <see cref="Photo"/> from a photo file.
     ''' </summary>
     ''' <param name="File">The <see cref="IO.FileInfo"/> from which to create the <see cref="Photo"/>.</param>
-    ''' <returns>A <see cref="Photo"/> representing the file speciifed by <paramref name="File"/> or <c>Nothing</c> if the file metadate could not be read.</returns>
+    ''' <returns>A <see cref="Photo"/> representing the file specified by <paramref name="File"/> or <c>Nothing</c> if the file metadate could not be read.</returns>
     ''' <remarks>This method currently uses the file's extension to differentiate file types. Supported extension are .JPG, .JPEG, and .JPE. While there are plans to include support for other formats, such as MP4, support is only available for JPEG photos at this time.</remarks>
-    Shared Function FromFile(File As IO.FileInfo) As Photo
+    Shared Function FromFile(File As IO.FileInfo, Project As Project) As Photo
         Dim res As New Photo
+        res.Project = Project
 
         Return res.RefreshMetadata(File)
     End Function
 
+    '''' <summary>
+    '''' Generate an <see cref="IEnumerable(Of Photo)"/> from a list of photo files.
+    '''' </summary>
+    '''' <param name="Files">The <see cref="IEnumerable(Of IO.FileInfo)"/> from which to create the <see cref="IEnumerable(Of Photo)"/>.</param>
+    '''' <returns>An <see cref="IEnumerable(Of Photo)"/> representing the files specified by <see cref="IEnumerable(Of IO.FileInfo)"/>. Only files from which metadate could be read will be contained in the returned list. The list will contain unique items even if a file is specified more than once.</returns>
+    '''' <remarks>This method currently uses the file's extension to differentiate file types. Supported extension are .JPG, .JPEG, and .JPE. While there are plans to include support for other formats, such as MP4, support is only available for JPEG photos at this time.</remarks>
+    'Shared Function FromFiles(Files As IEnumerable(Of IO.FileInfo)) As IEnumerable(Of Photo)
+    '    Dim f = Files.Distinct.ToList
+
+
+    '    Dim res = (From i In f Select Photo.FromFile(i)).SkipWhile(Function(p) p Is Nothing)
+
+
+    '    Return res
+
+    'End Function
+
+    Public Project As Project
     <CSVField(CSVFieldName:="Latitude")> Public Lat As Double
     <CSVField(CSVFieldName:="Longitude")> Public [Long] As Double
     <CSVField()> Public Filename As String
     <CSVField()> Public Filedate As Date
     <CSVField()> Public TakenDate As Date
-    <CSVField()> Public FileSize As ULong
+    <CSVField()> Public FileSize As Long
 
     Public ReadOnly Property LocationCount As Integer
         Get
@@ -109,7 +146,11 @@
         End Get
     End Property
 
-    Public Locations As New List(Of Location)
+    Public ReadOnly Property Locations As IEnumerable(Of Location)
+        Get
+            Return From i In Project.Locations Where i.Photos.Contains(Me) Distinct
+        End Get
+    End Property
 
     ''' <summary>
     ''' Renames the file this <see cref="Photo"/> is associated with and updates the Creation and LastWrite dates to match <see cref="Photo.TakenDate"/>.
@@ -136,5 +177,23 @@
 
         Me.RefreshMetadata(a)
     End Sub
+
+    Public ReadOnly Property ListviewItem As ListViewItem
+        Get
+            Static lvi = New ListViewItem
+
+            lvi.SubItems.Clear()
+
+            lvi.Text = Me.TakenDate
+            lvi.SubItems.AddRange({
+                                  Me.Lat.ToString("0.000000"),
+                                  Me.Long.ToString("0.000000"),
+                                  Me.LocationCount.ToString})
+            Return lvi
+
+        End Get
+    End Property
+
+
 
 End Class

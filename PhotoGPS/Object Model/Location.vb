@@ -1,8 +1,19 @@
 ﻿Public Class Location
+
+
+    Public Project As Project
+    <CSVField(CSVFieldName:="Latitude")> Public Lat As Double?
+    <CSVField(CSVFieldName:="Longitude")> Public [Long] As Double?
+    <CSVField()> Public Start As Date?
+    <CSVField()> Public [End] As Date?
+    <CSVField("Name")> Public LocationName As String
+    <CSVField()> Public Address As String
+    <CSVField()> Public ID As String
+
     Public Property GPS As GMap.NET.PointLatLng?
         Get
             If Lat.HasValue And [Long].HasValue Then
-                Return New GMap.NET.PointLatLng(Lat, [Long])
+                Return New GMap.NET.PointLatLng(Lat.Value, [Long].Value)
             Else
                 Return New GMap.NET.PointLatLng?
             End If
@@ -19,24 +30,29 @@
         End Set
     End Property
 
-    <CSVField(CSVFieldName:="Latitude")> Public Lat As Double?
-    <CSVField(CSVFieldName:="Longitude")> Public [Long] As Double?
-    <CSVField()> Public Start As Date?
-    <CSVField()> Public [End] As Date?
-    <CSVField("Name")> Public LocationName As String
-    <CSVField()> Public Address As String
-    <CSVField()> Public ID As String
-
     <CSVField(CSVFieldName:="Photo Count", Readable:=False, Writeable:=True)> Public ReadOnly Property PhotoCount As Integer
         Get
-            Return If(Photos IsNot Nothing, Photos.Count, 0)
+            Return Photos.Count
         End Get
     End Property
 
-    Public Photos As List(Of Photo)
+    Private _Photos As List(Of Photo)
+    Public Property Photos As List(Of Photo) 'we use a list instead of an iEnumerable as, while this will be initially set by a query, the user may change the contents at any time
+        Get
+            If _Photos Is Nothing Then _Photos = PhotosFromLocation().ToList
+
+            Return _Photos
+        End Get
+        Set(value As List(Of Photo))
+            _Photos = value
+        End Set
+    End Property
+
+    Public Function PhotosFromLocation() As IEnumerable(Of Photo)
+        Return From i In Project.Photos Where ComparePhoto(i)
+    End Function
 
     Public Function ComparePhoto(Photo As Photo) As Boolean
-
         If GPS.HasValue Then
             Dim datesMatch As Boolean = False
 
@@ -67,5 +83,30 @@
             Return (Start.HasValue And [End].HasValue)
         End Get
     End Property
+
+    Private lvi As ListViewItem
+    Public ReadOnly Property ListViewItem As ListViewItem
+        Get
+            If lvi Is Nothing Then
+                lvi = New ListViewItem
+                UpdateListViewItem()
+            End If
+
+            Return lvi
+        End Get
+    End Property
+
+    Public Sub UpdateListViewItem()
+        lvi.SubItems.Clear()
+        lvi.Text = Me.LocationName
+
+        lvi.SubItems.AddRange({New ListViewItem.ListViewSubItem(lvi, If(Me.Start.HasValue, Me.Start.Value.ToShortDateString, String.Empty)),
+                              New ListViewItem.ListViewSubItem(lvi, If(Me.End.HasValue, Me.End.Value.ToShortDateString, String.Empty)),
+                              New ListViewItem.ListViewSubItem(lvi, Me.Address),
+                              New ListViewItem.ListViewSubItem(lvi, If(Me.Lat.HasValue, Me.Lat.Value.ToString("0.000000"), String.Empty)),
+                              New ListViewItem.ListViewSubItem(lvi, If(Me.Long.HasValue, Me.Long.Value.ToString("0.000000"), String.Empty)),
+                              New ListViewItem.ListViewSubItem(lvi, Me.ID),
+                              New ListViewItem.ListViewSubItem(lvi, Me.PhotoCount.ToString)})
+    End Sub
 
 End Class

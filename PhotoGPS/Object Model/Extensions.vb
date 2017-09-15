@@ -43,8 +43,15 @@ End Module
 
 
 Module PointLatLngExtensions
+    ''' <summary>
+    ''' Compare the distance between two <see cref="PointLatLng"/> values.
+    ''' </summary>
+    ''' <param name="Start">A <see cref="PointLatLng"/> value representing the starting point for the measurement.</param>
+    ''' <param name="Destination">A <see cref="PointLatLng"/> value representing the ending point for the measurement.</param>
+    ''' <param name="Units">Optional. One of the values from <see cref="DistanceToUnits"/> indicating what units the return value should be specified in. If this parameter is not specified, the default value of <see cref="DistanceToUnits.Miles"/> is assumed.</param>
+    ''' <returns></returns>
     <Extension()>
-    Public Function DistanceTo(Start As PointLatLng, Destination As PointLatLng, Optional Units As DistanceToUnits = DistanceToUnits.Meters) As Double
+    Public Function DistanceTo(Start As PointLatLng, Destination As PointLatLng, Optional Units As DistanceToUnits = DistanceToUnits.Miles) As Double
         Const METERSPERKILOMETER As Integer = 1000
         Const FEETPERMETER As Double = 3.28084
         Const FEETPERYARD As Integer = 3
@@ -67,11 +74,34 @@ Module PointLatLngExtensions
                 Throw New NotImplementedException()
         End Select
     End Function
+
+    ''' <summary>
+    ''' Used to indicate which measurement unit to return from <see cref="DistanceTo(PointLatLng, PointLatLng, DistanceToUnits)"/>.
+    ''' </summary>
     Public Enum DistanceToUnits
+        ''' <summary>
+        ''' The return value is measured in meters.
+        ''' </summary>
         Meters = 0
+
+        ''' <summary>
+        ''' The return value is measured in kilometers.
+        ''' </summary>
         Kilometers = 1 '0.001
+
+        ''' <summary>
+        ''' The return value is measured in feet.
+        ''' </summary>
         Feet = 2
+
+        ''' <summary>
+        ''' The return value is measured in yards.
+        ''' </summary>
         Yards = 3
+
+        ''' <summary>
+        ''' The return value is measured in miles.
+        ''' </summary>
         Miles = 4
     End Enum
 
@@ -86,7 +116,7 @@ Module PointLatLngExtensions
         ' using Vincenty inverse formula for ellipsoids
         '======================================
         ' Code has been ported by lost_species from www.aliencoffee.co.uk to VBA
-        ' from javascript published at:
+        ' from javaScript published at:
         ' http://www.movable-type.co.uk/scripts/latlong-vincenty.html
         ' * from: Vincenty inverse formula - T Vincenty, "Direct and Inverse Solutions
         ' *       of Geodesics on the Ellipsoid with application
@@ -260,77 +290,6 @@ Module PointLatLngExtensions
 
     End Function
 
-    Private Function SignIt(Degree_Dec As String) As Double
-        'Input:   a string representation of a lat or long in the
-        '         format of 10° 27' 36" S/N  or 10~ 27' 36" E/W
-        'OUTPUT:  signed decimal value ready to convert to radians
-        '
-        Dim decimalValue As Double
-        Dim tempString As String
-        tempString = UCase(Trim(Degree_Dec))
-        decimalValue = Convert_Decimal(tempString)
-        If Right(tempString, 1) = "S" Or Right(tempString, 1) = "W" Then
-            decimalValue = decimalValue * -1
-        End If
-        SignIt = decimalValue
-    End Function
-
-    Private Function Convert_Degree(Decimal_Deg As Double) As String
-        'source: http://support.microsoft.com/kb/213449
-        '
-        'converts a decimal degree representation to deg min sec
-        'as 10.46 returns 10° 27' 36"
-        '
-        Dim degrees As String
-        Dim minutes As String
-        Dim seconds As String
-        '        With Application
-        'Set degree to Integer of Argument Passed
-        degrees = Int(Decimal_Deg)
-        'Set minutes to 60 times the number to the right
-        'of the decimal for the variable Decimal_Deg
-        minutes = (Decimal_Deg - degrees) * 60
-        'Set seconds to 60 times the number to the right of the
-        'decimal for the variable Minute
-        seconds = Format(((minutes - Int(minutes)) * 60), "0")
-        'Returns the Result of degree conversion
-        '(for example, 10.46 = 10° 27' 36")
-        Convert_Degree = " " & degrees & "° " & Int(minutes) & "' " _
-         & seconds + Chr(34)
-        '        End With
-    End Function
-
-    Private Function Convert_Decimal(Degree_Deg As String) As Double
-        'source: http://support.microsoft.com/kb/213449
-        ' Declare the variables to be double precision floating-point.
-        ' Converts text angular entry to decimal equivalent, as:
-        ' 10° 27' 36" returns 10.46
-        ' alternative to ° is permitted: Use ~ instead, as:
-        ' 10~ 27' 36" also returns 10.46
-        Dim degrees As Double
-        Dim minutes As Double
-        Dim seconds As Double
-        '
-        'modification by JLatham
-        'allow the user to use the ~ symbol instead of ° to denote degrees
-        'since ~ is available from the keyboard and ° has to be entered
-        'through [Alt] [0] [1] [7] [6] on the number pad.
-        Degree_Deg = Replace(Degree_Deg, "~", "°")
-
-        ' Set degree to value before "°" of Argument Passed.
-        degrees = Val(Left(Degree_Deg, InStr(1, Degree_Deg, "°") - 1))
-        ' Set minutes to the value between the "°" and the "'"
-        ' of the text string for the variable Degree_Deg divided by
-        ' 60. The Val function converts the text string to a number.
-        minutes = Val(Mid(Degree_Deg, InStr(1, Degree_Deg, "°") + 2,
-             InStr(1, Degree_Deg, "'") - InStr(1, Degree_Deg, "°") - 2)) / 60
-        ' Set seconds to the number to the right of "'" that is
-        ' converted to a value and then divided by 3600.
-        seconds = Val(Mid(Degree_Deg, InStr(1, Degree_Deg, "'") +
-           2, Len(Degree_Deg) - InStr(1, Degree_Deg, "'") - 2)) / 3600
-        Convert_Decimal = degrees + minutes + seconds
-    End Function
-
     Private Function toRad(ByVal degrees As Double) As Double
         toRad = degrees * (Math.PI / 180)
     End Function
@@ -358,5 +317,76 @@ Module PointLatLngExtensions
             End If
         End If
     End Function
+
+    'Private Function SignIt(Degree_Dec As String) As Double
+    '    'Input:   a string representation of a lat or long in the
+    '    '         format of 10° 27' 36" S/N  or 10~ 27' 36" E/W
+    '    'OUTPUT:  signed decimal value ready to convert to radians
+    '    '
+    '    Dim decimalValue As Double
+    '    Dim tempString As String
+    '    tempString = UCase(Trim(Degree_Dec))
+    '    decimalValue = Convert_Decimal(tempString)
+    '    If Right(tempString, 1) = "S" Or Right(tempString, 1) = "W" Then
+    '        decimalValue = decimalValue * -1
+    '    End If
+    '    SignIt = decimalValue
+    'End Function
+
+    'Private Function Convert_Degree(Decimal_Deg As Double) As String
+    '    'source: http://support.microsoft.com/kb/213449
+    '    '
+    '    'converts a decimal degree representation to deg min sec
+    '    'as 10.46 returns 10° 27' 36"
+    '    '
+    '    Dim degrees As String
+    '    Dim minutes As String
+    '    Dim seconds As String
+    '    '        With Application
+    '    'Set degree to Integer of Argument Passed
+    '    degrees = Int(Decimal_Deg)
+    '    'Set minutes to 60 times the number to the right
+    '    'of the decimal for the variable Decimal_Deg
+    '    minutes = (Decimal_Deg - degrees) * 60
+    '    'Set seconds to 60 times the number to the right of the
+    '    'decimal for the variable Minute
+    '    seconds = Format(((minutes - Int(minutes)) * 60), "0")
+    '    'Returns the Result of degree conversion
+    '    '(for example, 10.46 = 10° 27' 36")
+    '    Convert_Degree = " " & degrees & "° " & Int(minutes) & "' " _
+    '     & seconds + Chr(34)
+    '    '        End With
+    'End Function
+
+    'Private Function Convert_Decimal(Degree_Deg As String) As Double
+    '    'source: http://support.microsoft.com/kb/213449
+    '    ' Declare the variables to be double precision floating-point.
+    '    ' Converts text angular entry to decimal equivalent, as:
+    '    ' 10° 27' 36" returns 10.46
+    '    ' alternative to ° is permitted: Use ~ instead, as:
+    '    ' 10~ 27' 36" also returns 10.46
+    '    Dim degrees As Double
+    '    Dim minutes As Double
+    '    Dim seconds As Double
+    '    '
+    '    'modification by JLatham
+    '    'allow the user to use the ~ symbol instead of ° to denote degrees
+    '    'since ~ is available from the keyboard and ° has to be entered
+    '    'through [Alt] [0] [1] [7] [6] on the number pad.
+    '    Degree_Deg = Replace(Degree_Deg, "~", "°")
+
+    '    ' Set degree to value before "°" of Argument Passed.
+    '    degrees = Val(Left(Degree_Deg, InStr(1, Degree_Deg, "°") - 1))
+    '    ' Set minutes to the value between the "°" and the "'"
+    '    ' of the text string for the variable Degree_Deg divided by
+    '    ' 60. The Val function converts the text string to a number.
+    '    minutes = Val(Mid(Degree_Deg, InStr(1, Degree_Deg, "°") + 2,
+    '         InStr(1, Degree_Deg, "'") - InStr(1, Degree_Deg, "°") - 2)) / 60
+    '    ' Set seconds to the number to the right of "'" that is
+    '    ' converted to a value and then divided by 3600.
+    '    seconds = Val(Mid(Degree_Deg, InStr(1, Degree_Deg, "'") +
+    '       2, Len(Degree_Deg) - InStr(1, Degree_Deg, "'") - 2)) / 3600
+    '    Convert_Decimal = degrees + minutes + seconds
+    'End Function
 End Module
 

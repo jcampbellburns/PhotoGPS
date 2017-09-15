@@ -39,7 +39,7 @@ Public Class Photo
         Select Case File.Extension.ToUpper
             Case ".JPG", ".JPEG", ".JPE"
                 'pull metadata
-                'instanciate Photo
+                'instantiate Photo
                 'return it
 
                 'Dim res As Photo = Nothing
@@ -79,7 +79,7 @@ Public Class Photo
                         End With
 
                         If (HasGPS = False) Or (HasTakenDate = False) Then
-                            'I want only photos that have gps and a taken date. If either are missing, don't do anything with the image.
+                            'I want only photos that have GPS and a taken date. If either are missing, don't do anything with the image.
                             Return Nothing
                         Else
                             Return Me
@@ -93,7 +93,7 @@ Public Class Photo
                 End Try
 
             Case Else
-                '"MOV" and "MP4" are not supported yet. GoPro has not made any information public about how gps data is stored in their files.
+                '"MOV" and "MP4" are not supported yet. GoPro has not made any information public about how GPS data is stored in their files.
                 Return Nothing
         End Select
     End Function
@@ -102,7 +102,7 @@ Public Class Photo
     ''' Generate a <see cref="Photo"/> from a photo file.
     ''' </summary>
     ''' <param name="File">The <see cref="IO.FileInfo"/> from which to create the <see cref="Photo"/>.</param>
-    ''' <returns>A <see cref="Photo"/> representing the file specified by <paramref name="File"/> or <c>Nothing</c> if the file metadate could not be read.</returns>
+    ''' <returns>A <see cref="Photo"/> representing the file specified by <paramref name="File"/> or <c>Nothing</c> if the file metadata could not be read.</returns>
     ''' <remarks>This method currently uses the file's extension to differentiate file types. Supported extension are .JPG, .JPEG, and .JPE. While there are plans to include support for other formats, such as MP4, support is only available for JPEG photos at this time.</remarks>
     Shared Function FromFile(File As IO.FileInfo, Project As Project) As Photo
         Dim res As New Photo
@@ -115,7 +115,7 @@ Public Class Photo
     '''' Generate an <see cref="IEnumerable(Of Photo)"/> from a list of photo files.
     '''' </summary>
     '''' <param name="Files">The <see cref="IEnumerable(Of IO.FileInfo)"/> from which to create the <see cref="IEnumerable(Of Photo)"/>.</param>
-    '''' <returns>An <see cref="IEnumerable(Of Photo)"/> representing the files specified by <see cref="IEnumerable(Of IO.FileInfo)"/>. Only files from which metadate could be read will be contained in the returned list. The list will contain unique items even if a file is specified more than once.</returns>
+    '''' <returns>An <see cref="IEnumerable(Of Photo)"/> representing the files specified by <see cref="IEnumerable(Of IO.FileInfo)"/>. Only files from which metadata could be read will be contained in the returned list. The list will contain unique items even if a file is specified more than once.</returns>
     '''' <remarks>This method currently uses the file's extension to differentiate file types. Supported extension are .JPG, .JPEG, and .JPE. While there are plans to include support for other formats, such as MP4, support is only available for JPEG photos at this time.</remarks>
     'Shared Function FromFiles(Files As IEnumerable(Of IO.FileInfo)) As IEnumerable(Of Photo)
     '    Dim f = Files.Distinct.ToList

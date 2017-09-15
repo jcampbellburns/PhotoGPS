@@ -18,7 +18,7 @@
             Dim NumberOfRows = CSVData.LongCount
 
             With DGcsv
-                'reset datagridview
+                'reset dataGridView
                 .Columns.Clear()
                 .Rows.Clear()
 
@@ -40,7 +40,7 @@
                 End If
 
 
-                'add field selection dropdown
+                'add field selection drop down
                 Dim currentheaderrow As New DataGridViewRow
                 For i = 0 To NumberOfColumns - 1
 
@@ -80,7 +80,7 @@
                     Next
                 End If
 
-                'add sample csv data
+                'add sample CSV data
                 For r As Long = If(Me.CBXFirstRowColumnNames.Checked, 1, 0) To If((NumberOfRows - 1) > 100, 100, (NumberOfRows - 1))
 
                     Dim currentdatarow As New DataGridViewRow
@@ -118,7 +118,7 @@
 
     Private Sub DGcsv_EditingControlShowing(sender As Object, e As DataGridViewEditingControlShowingEventArgs) Handles DGcsv.EditingControlShowing
         'This method ensures that each object field can be selected only once.
-        'This is done by removing items from the dropdown control which are selected in other columns.
+        'This is done by removing items from the drop down control which are selected in other columns.
         With DirectCast(e.Control, ComboBox).Items
             Dim ColumnCount = DGcsv.Columns.GetColumnCount(DataGridViewElementStates.None)
 
@@ -157,7 +157,7 @@
     End Sub
 
     Private Sub PrepareData()
-        'set first row of data to Object field dropdowns
+        'set first row of data to Object field drop downs
         Dim HeaderRow As New List(Of String)
         For i = 0 To Me.DGcsv.Columns.GetColumnCount(DataGridViewElementStates.None) - 1
             HeaderRow.Add(DGcsv.Rows(0).Cells(i).Value)

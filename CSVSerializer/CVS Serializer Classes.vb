@@ -19,15 +19,15 @@ Public NotInheritable Class CSVSerializer(Of t As New)
 
     Shared Function Serialize(objects As IEnumerable(Of t)) As String
 
-        'set up result stringbuilder
-        'add column headers to csv result
+        'set up result StringBuilder
+        'add column headers to CSV result
         'cycle through all the objects in the collection
         '   cycle through all the fields in _CSVColumnHeaders
         '       use reflection to pull the value
         '       convert to string
         '       append to current row
-        '   append crlf and most recent row to end of csv result
-        'return csv result
+        '   append CRLF and most recent row to end of CSV result
+        'return CSV result
 
         Dim csvResult As New Text.StringBuilder
             Dim csvRow As New Text.StringBuilder
@@ -81,7 +81,7 @@ Public NotInheritable Class CSVSerializer(Of t As New)
     ''' <remarks>As implemented, this function is compliant with RFC 4180. Specifically, if <c>value</c> contains one or more of a double-quotation mark ("), comma (,), carriage return, or linefeed, the return value will be <c>value</c> with double-quotation marks appended to both the beginning and the end.</remarks>
     Private Shared Function AddQuotesIfNeeded(value As String) As String
         If value IsNot Nothing Then
-            If value.Intersect({""""c, ","c, vbCr(0), vbLf(0)}).Count > 0 Then 'this uses Linq to intersect the array of Char with an array of Char containing a double quote, a comma, a CR, and LF. If the count is > 0, this means at least one was found and the value needs to be fully quoted.
+            If value.Intersect({""""c, ","c, vbCr(0), vbLf(0)}).Count > 0 Then 'this uses LINQ to intersect the array of Char with an array of Char containing a double quote, a comma, a CR, and LF. If the count is > 0, this means at least one was found and the value needs to be fully quoted.
                 Return """" & value & """"
             Else
                 Return value
@@ -123,14 +123,14 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
         '2: set up file stream
         '3: import all data
         '4: show field mapping
-        '5: perform field conversaion
-        '6: instanciate a new t and populate
+        '5: perform field conversion
+        '6: instantiate a new t and populate
 
 
         'step 1: show file selection
         Dim OpenWindow As New System.Windows.Forms.OpenFileDialog With {
                                         .Filter = "Comma Separated Values|*.csv|All Files|*.*",
-                                        .DefaultExt = "csv",
+                                        .DefaultExt = "CSV",
                                         .ShowReadOnly = False}
 
         'Kludge: this Deserialize(...) may or may not be called from the UI thread. The variable 'a' below contains code which must be called on the UI thread
@@ -205,12 +205,12 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
             Dim MappedValues = FieldMappingForm.CSVData
             Dim Res As New List(Of t)
 
-            'step 6: instanciate a new t and populate
+            'step 6: instantiate a new t and populate
 
             'This section works like this:
             'For each row in the data (except the first row which now has headers):
             '   Create a new T.
-            '   For Each value in the row, find the ColumnHeader object With a matching CSVName. From that object, we now know which member of T to set. Convert the     value To the primitive datatype (see ConvertType) based on the datatype. Use reflection to set the value.
+            '   For Each value in the row, find the ColumnHeader object With a matching CSVName. From that object, we now know which member of T to set. Convert the     value To the primitive data type (see ConvertType) based on the data type. Use reflection to set the value.
             '   Add the created T to a list
             'Once we're done with all of the rows, return the list
             For Each DataRow In MappedValues
@@ -285,10 +285,10 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
     ''' <param name="CSVStream">A <see cref="IO.Stream"/> which provides CSV data.</param>
     ''' <exception cref="MalformedCSVException">Thrown if text occurs between a , delimiter and a " quote.</exception>
     ''' <exception cref="ArgumentException">Thrown if the stream provided to the function can't seek or read.</exception>
-    ''' <returns>A <see cref="List(Of List(Of String))"/> containing the fully parsed CSV file with each element containing one value. Each <see cref="List(Of String)"/> in the <see cref="List(Of List(Of String))"/> represents one row of valuse from the CSV data. Each <see cref="String"/> in the <see cref="List(Of String)"/> represents an individual value.</returns>
+    ''' <returns>A <see cref="List(Of List(Of String))"/> containing the fully parsed CSV file with each element containing one value. Each <see cref="List(Of String)"/> in the <see cref="List(Of List(Of String))"/> represents one row of values from the CSV data. Each <see cref="String"/> in the <see cref="List(Of String)"/> represents an individual value.</returns>
     ''' <remarks>
     ''' Any combination of one or two of either or both CR and LF are considered a newline. Newlines within quotation marks are treated as literals and are inserted into the particular value it appears in as presented. Newlines outside of quotes are stripped and treated as the end of a.
-    ''' Spaces are not trimmed from records. All values are expceted to be separated by a comma (,) without a space.
+    ''' Spaces are not trimmed from records. All values are expected to be separated by a comma (,) without a space.
     ''' Paired double quotes ("") are escaped to a single double quote (").
     ''' </remarks>
     Private Shared Function ParseCSV(CSVStream As IO.Stream, pb As PostBack) As List(Of List(Of String))
@@ -421,7 +421,7 @@ Public NotInheritable Class CSVDeserializer(Of t As New)
 End Class
 
 ''' <summary>
-''' Associates a property or field with a specific column name in a CSV file. Used both for reading and writing csv.
+''' Associates a property or field with a specific column name in a CSV file. Used both for reading and writing CSV.
 ''' </summary>
 <AttributeUsage(AttributeTargets.Property Or AttributeTargets.Field, AllowMultiple:=False, Inherited:=False)>
 Public Class CSVFieldAttribute
@@ -446,7 +446,7 @@ Public Class CSVFieldAttribute
         Me.CSVFieldName = CSVFieldName
 
         If (Readable = False) And (Writeable = False) Then
-            Throw New ArgumentException("Readable and Writeable cannot both be False.")
+            Throw New ArgumentException("Readable and Writable cannot both be False.")
         End If
         Me.Readable = Readable
         Me.Writeable = Writeable

@@ -57,7 +57,7 @@
             Dim datesMatch As Boolean = False
 
             If HasDates Then
-                'a location can start and end on the same day. Since a photo can occur at any time between the start and end of any day, we need to make sure to look between the begining of Start and the end of End. Best way to do that is to make the range of Start and End 24- hours.
+                'a location can start and end on the same day. Since a photo can occur at any time between the start and end of any day, we need to make sure to look between the beginning of Start and the end of End. Best way to do that is to make the range of Start and End 24-hours.
                 Dim realEnd As Date = [End].Value.AddDays(1)
 
                 If (Photo.TakenDate >= Start) And (Photo.TakenDate <= realEnd) Then
@@ -66,16 +66,14 @@
                     datesMatch = False
                 End If
             Else
-                datesMatch = True 'all photos match a location with no dates so long as the gps DOES match
+                datesMatch = True 'all photos match a location with no dates so long as the GPS DOES match
             End If
 
             Dim gpsMatch = (GPS.Value.DistanceTo(Photo.GPS, DistanceToUnits.Miles) < 0.5)
             Return datesMatch And gpsMatch
         Else
-            Return False 'no photos match a location with no gps
+            Return False 'no photos match a location with no GPS
         End If
-
-
     End Function
 
     Public ReadOnly Property HasDates As Boolean

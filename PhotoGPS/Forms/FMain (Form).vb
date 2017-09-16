@@ -381,10 +381,44 @@
 
             If MsgBoxRecursiveResponse <> MsgBoxResult.Cancel Then
                 Dim folder = New IO.DirectoryInfo(fb.FileName)
+                Dim filecount = 0
+                Dim foldercount = 0
 
-                Dim AllFiles = From i In folder.EnumerateFiles("*", If(MsgBoxRecursiveResponse = MsgBoxResult.Yes, IO.SearchOption.AllDirectories, IO.SearchOption.TopDirectoryOnly))
+                Dim recursefiles As Func(Of IO.DirectoryInfo, IEnumerable(Of IO.FileInfo)) =
+                    Function(f As IO.DirectoryInfo) As IEnumerable(Of IO.FileInfo)
+                        If Not CancelTask Then
 
-                AddPhotoFiles(AllFiles)
+                            'TODO: implement the next line with a For...Each so the user can cancel it if needed
+                            Dim res As IEnumerable(Of IO.FileInfo) = f.GetFiles()
+
+                            filecount += res.Count
+
+                            If MsgBoxRecursiveResponse = MsgBoxResult.Yes And Not CancelTask Then
+                                For Each subfolder In f.GetDirectories()
+                                    foldercount += 1
+                                    res = res.Union(recursefiles.Invoke(subfolder))
+                                Next
+                            End If
+
+                            SetProgressStatus(String.Format("Enumerating files. Found {0} files in {1} folders.", filecount, foldercount), 0)
+
+                            Return res
+                        Else
+                            Return Enumerable.Empty(Of IO.FileInfo)
+                        End If
+                    End Function
+
+                Dim a =
+                    Sub()
+                        InitShowProgress(True, AppControls)
+
+                        Dim allfiles = recursefiles(folder)
+                        AddPhotoFiles(allfiles)
+
+                        InitShowProgress(False, AppControls)
+                    End Sub
+
+                a.BeginInvoke(Nothing, Nothing)
 
             End If
         End If
@@ -405,7 +439,14 @@
         fb.EnsurePathExists = True
 
         If fb.ShowDialog() = DialogResult.OK Then
-            AddPhotoFiles(From i In fb.FileNames Select New IO.FileInfo(i))
+            Dim a =
+                Sub()
+                    InitShowProgress(True, AppControls)
+                    AddPhotoFiles(From i In fb.FileNames Select New IO.FileInfo(i))
+                    InitShowProgress(False, AppControls)
+                End Sub
+
+            a.BeginInvoke(Nothing, Nothing)
         End If
     End Sub
 
@@ -414,36 +455,30 @@
     ''' </summary>
     ''' <param name="AllFiles">An instance implementing the interface <see cref="IEnumerable(Of IO.IOFileinfo)"/> which contains files from which to create instances of <see cref="Photo"/>.</param>
     Private Sub AddPhotoFiles(AllFiles As IEnumerable(Of IO.FileInfo))
-        Dim a =
-            Sub()
-                Dim FilteredFiles = (From f In AllFiles From x In Photo.SupportedExtensions Where f.Extension.ToLower = x.ToLower Select f).ToList
-                Dim AddedPhotos = New List(Of Photo)
-                Dim count = FilteredFiles.Count
-                Dim current = 0
+        Dim FilteredFiles = (From f In AllFiles From x In Photo.SupportedExtensions Where f.Extension.ToLower = x.ToLower Select f).ToList
+        Dim AddedPhotos = New List(Of Photo)
+        Dim count = FilteredFiles.Count
+        Dim current = 0
 
-                InitShowProgress(True, AppControls)
+        For Each f In FilteredFiles
+            If CancelTask Then Exit For
+            current += 1
 
-                For Each f In FilteredFiles
-                    If CancelTask Then Exit For
-                    current += 1
+            If Not CancelTask Then
+                SetProgressStatus(String.Format("Adding photos. {0} remaining.", count - current), current / count)
+                Dim NewPhoto = Photo.FromFile(f, Project)
 
-                    If Not CancelTask Then
-                        SetProgressStatus(String.Format("Adding photos. {0} remaining.", count - current), current / count)
-                        Dim NewPhoto = Photo.FromFile(f, Project)
+                If NewPhoto IsNot Nothing Then
+                    AddedPhotos.Add(NewPhoto)
+                End If
+            End If
+        Next
 
-                        If NewPhoto IsNot Nothing Then
-                            AddedPhotos.Add(NewPhoto)
-                        End If
-                    End If
-                Next
+        SetProgressStatus(String.Format("Adding photos. 0 remaining."), 1, True)
 
-                SetProgressStatus(String.Format("Adding photos. 0 remaining."), 1, True)
-                InitShowProgress(False, AppControls)
-                Project.Photos = (From i In Project.Photos.Concat(AddedPhotos) Where i IsNot Nothing Order By i.TakenDate).Distinct(New PhotoComparer)
-                Me.LVPhotos.Invoke(Sub() RefreshPhotosLV(True))
-            End Sub
+        Project.Photos = (From i In Project.Photos.Concat(AddedPhotos) Where i IsNot Nothing Order By i.TakenDate).Distinct(New PhotoComparer)
+        Me.LVPhotos.Invoke(Sub() RefreshPhotosLV(True))
 
-        a.BeginInvoke(Nothing, Nothing)
     End Sub
 
     ''' <summary>
@@ -485,7 +520,9 @@
                 _PhotoLVItems = (From p In Project.Photos Select p.ListviewItem).ToArray
             ElseIf (specialItemSelectionCount = 0) And (selectedLocationItems.Count > 0) Then
                 'if one or more location items and no special items are selected, display photos associated with selected locations
-                _PhotoLVItems = (From l In Project.Locations From p In l.Photos Where l.ListViewItem.Selected Select p.ListviewItem).Distinct.ToArray
+                '_PhotoLVItems = (From l In Project.Locations From p In l.Photos Where l.ListViewItem.Selected Select p.ListviewItem).Distinct.ToArray
+
+                _PhotoLVItems = (From l In (From l2 In Project.Locations Where selectedLocationItems.Contains(l2.ListViewItem)) From p In l.Photos Distinct Select p.ListviewItem).ToArray
             Else
                 'if more than one special location item is selected or selection contains both special location items and normal locations, display no photo items
                 _PhotoLVItems = {}
@@ -504,14 +541,27 @@
     ''' </summary>
     Private Sub RenameAllPhotos()
         If _PhotoLVItems.Count > 0 Then
-
             Dim selectedphotos = (From i In Project.Photos Where _PhotoLVItems.Contains(i.ListviewItem)).ToList
 
-            Threading.Tasks.Parallel.ForEach(Of Photo)(selectedphotos,
-                Sub(i)
-                    i.RenameFile()
-                End Sub)
+            Dim count = selectedphotos.Count
+            Dim current = 0
 
+            InitShowProgress(True, AppControls)
+
+            Dim a =
+                Sub()
+                    For Each i In selectedphotos
+                        If CancelTask Then Exit For
+                        current += 1
+
+                        i.RenameFile()
+                        SetProgressStatus(String.Format("Renaming files. {0} remaining", count - current), current / count)
+                    Next
+
+                    InitShowProgress(False, AppControls)
+                End Sub
+
+            a.BeginInvoke(Nothing, Nothing)
         End If
     End Sub
 
@@ -604,7 +654,13 @@
                                       i.MoveToFolder(folder)
                                   End Sub)
     End Sub
+
 #End Region
 #End Region
+
+
+    Private Sub FMain_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        CancelTask = True
+    End Sub
 
 End Class

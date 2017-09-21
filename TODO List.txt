@@ -4,11 +4,11 @@
 [DONE] Revise WaitWindow to be non-modal
 [DONE] Make sure all methods are at least minimally commented
 [DONE] Add progress bar to file rename
+[DONE] Add progress bar (or at least cancellation) to file enumeration
+[DONE] Edit Locations
 
-Add progress bar (or at least cancellation) to file enumeration
-
-Edit Locations
 Show locations/photos on map
+
 Drag/drop photo to location
 
 

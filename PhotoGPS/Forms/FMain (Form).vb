@@ -34,7 +34,11 @@
     ''' <summary>Object to store all instances of <see cref="Photo"/> and <see cref="Location"/>.</summary>
     Public Project As New Project
 
-#Region "Control Eventhandlers"
+#Region "Event Handlers"
+    Private Sub FMain_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        CancelTask = True
+    End Sub
+
 #Region "Location Toolstrip"
     Private Sub TSBImportLocations_Click(sender As Object, e As EventArgs) Handles TSBImportLocations.Click
         ImportLocations()
@@ -73,6 +77,18 @@
         Next
 
         Me.LVLocations.Refresh()
+    End Sub
+
+    Private Sub TSBEditLocation_Click(sender As Object, e As EventArgs) Handles TSBEditLocation.Click
+        EditLocations()
+    End Sub
+
+    Private Sub TSBAddLocation_Click(sender As Object, e As EventArgs) Handles TSBAddLocation.Click
+        Me.AddLocation()
+    End Sub
+
+    Private Sub TSBRemoveLocations_Click(sender As Object, e As EventArgs) Handles TSBRemoveLocations.Click
+        Me.RemoveLocations
     End Sub
 #End Region
 
@@ -143,19 +159,18 @@
     '''<summary>Array of <see cref="ToolStripItem"/> to be shown/hidden when app is busy and displaying progress bar.</summary>
     Private ShowProgressControls() As ToolStripItem 'Value is set in FMain.ctor()
 
-    ''' <summary>Indicates the user has clicked the Stop button. this value is reset from within <see cref="InitShowProgress(Boolean, Control())"/></summary>
+    ''' <summary>Indicates the user has clicked the Stop button. this value is reset from within <see cref="InitShowProgress(Boolean)"/></summary>
     Private CancelTask As Boolean 'Value is set in SSBStop_Click() and InitShowProgress()
 
     ''' <summary>
     ''' Shows/Hides progress bar and cancel button. Disables/Enables controls in an array.
     ''' </summary>
-    ''' <param name="ProgressControlState"><c>True</c>: Show the progress bar and cancel button. Disable all of the controls in <paramref name="ControlSet"/>. <c>False</c>: Hide the progress bar and cancel button. Enable all of the controls in <paramref name="ControlSet"/></param>
-    ''' <param name="ControlSet">An array of <see cref="Windows.Forms.Control"/> to enable or disable.</param>
-    Private Sub InitShowProgress(ProgressControlState As Boolean, ControlSet As Control())
-        CancelTask = False
+    ''' <param name="ProgressControlState"><c>True</c>: Show the progress bar and cancel button. <c>False</c>: Hide the progress bar and cancel button.</param>
+    Private Sub InitShowProgress(ProgressControlState As Boolean)
+        If ProgressControlState Then CancelTask = False
 
         Dim a = Sub()
-                    For Each i In ControlSet
+                    For Each i In AppControls
                         i.Enabled = Not ProgressControlState
                     Next
 
@@ -212,6 +227,7 @@
 
     Private Sub SSBStop_Click(sender As Object, e As EventArgs) Handles SSBStop.Click
         CancelTask = True
+        InitShowProgress(False)
     End Sub
 #End Region
 
@@ -221,7 +237,7 @@
     Private Sub RunCorrelation()
         Dim a =
         Sub()
-            InitShowProgress(True, AppControls)
+            InitShowProgress(True)
 
             Dim locations = (From i In Project.Locations Where _LocationLVItems.Contains(i.ListViewItem)).ToList
             Dim current = 0
@@ -248,7 +264,7 @@
                     Me._SpecialLocationItemPhotosWithMultipleLocations.SubItems(7).Text = (From p In Project.Photos Where p.Locations.Count > 1).Count
                     Me._SpecialLocationItemUnassociatedFilesItem.SubItems(7).Text = (From p In Project.Photos Where p.Locations.Count = 0).Count
                 End Sub)
-            InitShowProgress(False, AppControls)
+            InitShowProgress(False)
 
         End Sub
 
@@ -293,12 +309,12 @@
                 Return CancelTask
             End Function
 
-        Me.InitShowProgress(True, Me.AppControls)
+        Me.InitShowProgress(True)
 
         Dim a = Sub()
                     Project.Locations = CSVSerializer.CSVDeserializer(Of Location).Deserialize(pb, Me)
 
-                    Me.InitShowProgress(False, Me.AppControls)
+                    Me.InitShowProgress(False)
 
                     If Project.Locations IsNot Nothing Then
                         For Each l In Project.Locations
@@ -359,6 +375,53 @@
         If AlsoRunCorrelation Then RunCorrelation()
 
     End Sub
+
+    Private Sub EditLocations()
+        ''Pending v2.0
+        'InlineLocationEditor.BeginEdit(Me)
+
+
+        'v1.0
+        Dim firstSelectedNonSpecialLocationItem = SelectedLocationItems.Except(_SpecialLocationItems).FirstOrDefault
+        Dim firstSelectedLocation = (From i In Project.Locations Where i.ListViewItem Is firstSelectedNonSpecialLocationItem).FirstOrDefault
+
+        If firstSelectedLocation IsNot Nothing Then
+            Dim a = FLocationEditor.EditLocation(firstSelectedLocation)
+
+            If a.UpdateRequired Then
+                firstSelectedLocation.UpdateListViewItem()
+                LVLocations.Refresh()
+            End If
+        End If
+    End Sub
+
+    Private Sub AddLocation()
+        Dim newLocation As Location = Nothing
+
+        Dim a = FLocationEditor.EditLocation(newLocation)
+
+        If newLocation IsNot Nothing Then
+            newLocation.Project = Project
+            Project.Locations = Project.Locations.Concat({newLocation})
+            RefreshLocationsLV(False)
+            newLocation.ListViewItem.Selected = True
+            LVLocations.EnsureVisible(_LocationLVItems.ToList.IndexOf(newLocation.ListViewItem))
+        End If
+    End Sub
+
+    Private Sub RemoveLocations()
+        Project.Locations = Project.Locations.Except(SelectedLocations)
+        RefreshLocationsLV(False)
+    End Sub
+
+    Private Function SelectedLocations() As IEnumerable(Of Location)
+        Dim selecteditems = SelectedLocationItems().ToList
+        Return From i In Project.Locations Where selecteditems.Contains(i.ListViewItem)
+    End Function
+
+    Private Function SelectedLocationItems() As IEnumerable(Of ListViewItem)
+        Return From i In LVLocations.SelectedIndices Select _LocationLVItems(i)
+    End Function
 #End Region
 
 #Region "Photos"
@@ -400,7 +463,7 @@
                                 Next
                             End If
 
-                            SetProgressStatus(String.Format("Enumerating files. Found {0} files in {1} folders.", filecount, foldercount), 0)
+                            SetProgressStatus(String.Format("Enumerating files. Found {0} files in {1} folders. Currently reading folder {2}", filecount, foldercount, f.FullName), 0)
 
                             Return res
                         Else
@@ -410,12 +473,12 @@
 
                 Dim a =
                     Sub()
-                        InitShowProgress(True, AppControls)
+                        InitShowProgress(True)
 
                         Dim allfiles = recursefiles(folder)
                         AddPhotoFiles(allfiles)
 
-                        InitShowProgress(False, AppControls)
+                        InitShowProgress(False)
                     End Sub
 
                 a.BeginInvoke(Nothing, Nothing)
@@ -441,9 +504,9 @@
         If fb.ShowDialog() = DialogResult.OK Then
             Dim a =
                 Sub()
-                    InitShowProgress(True, AppControls)
+                    InitShowProgress(True)
                     AddPhotoFiles(From i In fb.FileNames Select New IO.FileInfo(i))
-                    InitShowProgress(False, AppControls)
+                    InitShowProgress(False)
                 End Sub
 
             a.BeginInvoke(Nothing, Nothing)
@@ -500,7 +563,7 @@
         If Project IsNot Nothing Then
 
             Dim specialItemSelectionCount = (From i In Me._SpecialLocationItems Where i.Selected).Count
-            Dim selectedLocationItems = (From i In _LocationLVItems Where i.Selected).Except(_SpecialLocationItems)
+            Dim selectedLocationItems = Me.SelectedLocationItems().Except(_SpecialLocationItems)
 
             If (specialItemSelectionCount = 1) And (selectedLocationItems.Count = 0) Then
                 'if a single special item and no location items are selected...
@@ -546,7 +609,7 @@
             Dim count = selectedphotos.Count
             Dim current = 0
 
-            InitShowProgress(True, AppControls)
+            InitShowProgress(True)
 
             Dim a =
                 Sub()
@@ -558,7 +621,7 @@
                         SetProgressStatus(String.Format("Renaming files. {0} remaining", count - current), current / count)
                     Next
 
-                    InitShowProgress(False, AppControls)
+                    InitShowProgress(False)
                 End Sub
 
             a.BeginInvoke(Nothing, Nothing)
@@ -592,7 +655,7 @@
             Dim current = 0
             Dim count = selectedphotos.Count
 
-            InitShowProgress(True, Me.AppControls)
+            InitShowProgress(True)
 
             Dim a = Sub()
                         For Each i In selectedphotos
@@ -608,7 +671,7 @@
                             End If
                         Next
 
-                        InitShowProgress(False, Me.AppControls)
+                        InitShowProgress(False)
                     End Sub
             a.BeginInvoke(Nothing, Nothing)
         End If
@@ -659,8 +722,7 @@
 #End Region
 
 
-    Private Sub FMain_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        CancelTask = True
-    End Sub
+
+
 
 End Class

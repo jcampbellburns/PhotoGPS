@@ -1,4 +1,9 @@
-﻿Imports System.Runtime.CompilerServices
+﻿Imports System.IO
+Imports System.Runtime.CompilerServices
+Imports System.Runtime.ConstrainedExecution
+Imports System.Runtime.InteropServices
+Imports System.Security.Permissions
+Imports Microsoft.Win32.SafeHandles
 
 Module IOFileinfoExtensions
 
@@ -40,7 +45,6 @@ Module IOFileinfoExtensions
         Return proposedFileName
     End Function
 End Module
-
 
 Module PointLatLngExtensions
     ''' <summary>
@@ -389,4 +393,3 @@ Module PointLatLngExtensions
     '    Convert_Decimal = degrees + minutes + seconds
     'End Function
 End Module
-

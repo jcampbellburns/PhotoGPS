@@ -53,9 +53,7 @@ Partial Class FMain
         Dim ColumnHeader10 As System.Windows.Forms.ColumnHeader
         Dim CAPTIONPhotos As PhotoGPS.CaptionBarControl
         Dim CAPTIONProject As PhotoGPS.CaptionBarControl
-        Dim ToolStripButton1 As System.Windows.Forms.ToolStripButton
         Dim STATUSMain As System.Windows.Forms.StatusStrip
-        Dim TSBStopOnLocationRefresh As System.Windows.Forms.ToolStripButton
         Me.MAP = New GMap.NET.WindowsForms.GMapControl()
         Me.TSAddress = New System.Windows.Forms.ToolStrip()
         Me.TSCoords = New System.Windows.Forms.ToolStrip()
@@ -76,6 +74,7 @@ Partial Class FMain
         Me.PANELPhotos = New System.Windows.Forms.Panel()
         Me.LVPhotos = New System.Windows.Forms.ListView()
         Me.TSPhotos = New System.Windows.Forms.ToolStrip()
+        Me.TSBRemovePhotos = New System.Windows.Forms.ToolStripButton()
         Me.TBSAddPhotos = New System.Windows.Forms.ToolStripSplitButton()
         Me.TSBAddPhotosFolder = New System.Windows.Forms.ToolStripMenuItem()
         Me.TSBAddPhotosFile = New System.Windows.Forms.ToolStripMenuItem()
@@ -89,12 +88,12 @@ Partial Class FMain
         Me.ToolStripButton11 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton14 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
+        Me.SSBStop = New System.Windows.Forms.ToolStripButton()
         Me.SSLStatus = New System.Windows.Forms.ToolStripStatusLabel()
         Me.SSPTaskProgress = New System.Windows.Forms.ToolStripProgressBar()
-        Me.SSBStop = New System.Windows.Forms.ToolStripButton()
         Me.TSMain = New System.Windows.Forms.ToolStrip()
         Me.ILFolder = New System.Windows.Forms.ImageList(Me.components)
-        Me.TSBRemovePhotos = New System.Windows.Forms.ToolStripButton()
         MENUMain = New System.Windows.Forms.MenuStrip()
         FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         TestToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -124,9 +123,7 @@ Partial Class FMain
         ColumnHeader10 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         CAPTIONPhotos = New PhotoGPS.CaptionBarControl()
         CAPTIONProject = New PhotoGPS.CaptionBarControl()
-        ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         STATUSMain = New System.Windows.Forms.StatusStrip()
-        TSBStopOnLocationRefresh = New System.Windows.Forms.ToolStripButton()
         MENUMain.SuspendLayout()
         PANELMap.SuspendLayout()
         Me.TSAddress.SuspendLayout()
@@ -191,6 +188,7 @@ Partial Class FMain
         Me.MAP.MarkersEnabled = True
         Me.MAP.MaxZoom = 2
         Me.MAP.MinZoom = 2
+        Me.MAP.MouseWheelZoomEnabled = True
         Me.MAP.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter
         Me.MAP.Name = "MAP"
         Me.MAP.NegativeMode = False
@@ -565,6 +563,16 @@ Partial Class FMain
         Me.TSPhotos.Size = New System.Drawing.Size(315, 25)
         Me.TSPhotos.TabIndex = 3
         '
+        'TSBRemovePhotos
+        '
+        Me.TSBRemovePhotos.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.TSBRemovePhotos.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TSBRemovePhotos.Image = CType(resources.GetObject("TSBRemovePhotos.Image"), System.Drawing.Image)
+        Me.TSBRemovePhotos.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TSBRemovePhotos.Name = "TSBRemovePhotos"
+        Me.TSBRemovePhotos.Size = New System.Drawing.Size(23, 22)
+        Me.TSBRemovePhotos.Text = "ToolStripButton5"
+        '
         'TBSAddPhotos
         '
         Me.TBSAddPhotos.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
@@ -696,21 +704,31 @@ Partial Class FMain
         '
         'ToolStripButton1
         '
-        ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
-        ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        ToolStripButton1.Name = "ToolStripButton1"
-        ToolStripButton1.Size = New System.Drawing.Size(23, 22)
-        ToolStripButton1.Text = "ToolStripButton1"
+        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
+        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton1.Name = "ToolStripButton1"
+        Me.ToolStripButton1.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButton1.Text = "ToolStripButton1"
         '
         'STATUSMain
         '
-        STATUSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SSLStatus, Me.SSPTaskProgress, Me.SSBStop})
+        STATUSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SSBStop, Me.SSLStatus, Me.SSPTaskProgress})
         STATUSMain.Location = New System.Drawing.Point(0, 565)
         STATUSMain.Name = "STATUSMain"
         STATUSMain.Size = New System.Drawing.Size(1402, 22)
         STATUSMain.TabIndex = 5
         STATUSMain.Text = "StatusStrip1"
+        '
+        'SSBStop
+        '
+        Me.SSBStop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.SSBStop.Image = CType(resources.GetObject("SSBStop.Image"), System.Drawing.Image)
+        Me.SSBStop.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.SSBStop.Name = "SSBStop"
+        Me.SSBStop.Size = New System.Drawing.Size(23, 20)
+        Me.SSBStop.Text = "ToolStripDropDownButton1"
+        Me.SSBStop.Visible = False
         '
         'SSLStatus
         '
@@ -724,29 +742,10 @@ Partial Class FMain
         Me.SSPTaskProgress.Size = New System.Drawing.Size(100, 16)
         Me.SSPTaskProgress.Visible = False
         '
-        'SSBStop
-        '
-        Me.SSBStop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.SSBStop.Image = CType(resources.GetObject("SSBStop.Image"), System.Drawing.Image)
-        Me.SSBStop.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.SSBStop.Name = "SSBStop"
-        Me.SSBStop.Size = New System.Drawing.Size(23, 20)
-        Me.SSBStop.Text = "ToolStripDropDownButton1"
-        Me.SSBStop.Visible = False
-        '
-        'TSBStopOnLocationRefresh
-        '
-        TSBStopOnLocationRefresh.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        TSBStopOnLocationRefresh.Image = CType(resources.GetObject("TSBStopOnLocationRefresh.Image"), System.Drawing.Image)
-        TSBStopOnLocationRefresh.ImageTransparentColor = System.Drawing.Color.Magenta
-        TSBStopOnLocationRefresh.Name = "TSBStopOnLocationRefresh"
-        TSBStopOnLocationRefresh.Size = New System.Drawing.Size(23, 22)
-        TSBStopOnLocationRefresh.Text = "ToolStripButton2"
-        '
         'TSMain
         '
         Me.TSMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        Me.TSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripButton1, TSBStopOnLocationRefresh})
+        Me.TSMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1})
         Me.TSMain.Location = New System.Drawing.Point(0, 24)
         Me.TSMain.Name = "TSMain"
         Me.TSMain.Size = New System.Drawing.Size(1402, 25)
@@ -758,16 +757,6 @@ Partial Class FMain
         Me.ILFolder.TransparentColor = System.Drawing.Color.Transparent
         Me.ILFolder.Images.SetKeyName(0, "VSO_Folder_16x.png")
         Me.ILFolder.Images.SetKeyName(1, "VSO_Document_16x.png")
-        '
-        'TSBRemovePhotos
-        '
-        Me.TSBRemovePhotos.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-        Me.TSBRemovePhotos.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.TSBRemovePhotos.Image = CType(resources.GetObject("TSBRemovePhotos.Image"), System.Drawing.Image)
-        Me.TSBRemovePhotos.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.TSBRemovePhotos.Name = "TSBRemovePhotos"
-        Me.TSBRemovePhotos.Size = New System.Drawing.Size(23, 22)
-        Me.TSBRemovePhotos.Text = "ToolStripButton5"
         '
         'FMain
         '
@@ -858,4 +847,5 @@ Partial Class FMain
     Friend WithEvents TSMain As ToolStrip
     Friend WithEvents SSLStatus As ToolStripStatusLabel
     Friend WithEvents TSBRemovePhotos As ToolStripButton
+    Friend WithEvents ToolStripButton1 As ToolStripButton
 End Class
